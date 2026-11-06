@@ -438,7 +438,7 @@
         <span id="p-price" style="font-size: 1.3rem; font-weight: 800; color: var(--gold-dark);"></span>
       </div>
 
-      <!-- أدوات اختيار المنتج الفردي -->
+      <!-- عناصر اختيار المنتج الفردي -->
       <div id="single-controls">
         <div class="options-title">المقاس المتاح:</div>
         <div class="options-row" id="p-sizes"></div>
@@ -446,7 +446,7 @@
         <div class="options-row" id="p-colors"></div>
       </div>
 
-      <!-- أدوات اختيار عروض الـ 3 قطع -->
+      <!-- عناصر اختيار العروض -->
       <div id="bundle-controls" style="display: none;">
         <div class="bundle-box">
           <div class="bundle-box-title" id="b1-title">القطعة الأولى</div>
@@ -583,7 +583,7 @@
       renderCatalog();
     }
 
-    // دالة لتنظيف وفصل الألوان والمقاسات من أي نصوص أو مصفوفات مركبة
+    // تفكيك ألوان الشيت بدون كتل مدمجة
     function cleanAndSplitValues(val) {
       if (!val) return [];
       if (Array.isArray(val)) {
@@ -593,7 +593,7 @@
         .replace(/[\[\]\(\)]/g, ' ')
         .split(/[,،\-\/\n]+/)
         .map(s => s.trim())
-        .filter(Boolean);
+        .filter(s => s.length > 0);
     }
 
     function openProductSheet(id) {
@@ -615,11 +615,9 @@
       if (isBundle) {
         renderBundleControlsFromSheet();
       } else {
-        // قراءة المقاسات بدقة
         let sizesArr = cleanAndSplitValues(activeItem.sizes);
         if (sizesArr.length === 0) sizesArr = ['37', '38', '39', '40', '41'];
 
-        // قراءة الألوان سواء كانت في colors أو colorsRaw وفصلها كأزرار فردية
         let colorsArr = cleanAndSplitValues(activeItem.colors || activeItem.colorsRaw);
         if (colorsArr.length === 0) colorsArr = ['أساسي'];
 
@@ -650,44 +648,11 @@
 
     function renderBundleControlsFromSheet() {
       const defaultSizes = ['37', '38', '39', '40', '41'];
-      let colors1 = ['اسود', 'بيج', 'هافان'];
-      let colors2 = ['اسود', 'ابيض', 'بني', 'فضي', 'بيج'];
-      let colors3 = ['اسود', 'بيج', 'هافان', 'كشمير'];
-
-      const raw = activeItem.colorsRaw || activeItem.colors;
-
-      if (raw) {
-        let rawStr = String(raw);
-        // تقسيم البيانات لو كانت جاية لكل قطعة بفاصل رئيسي (+ أو / أو -)
-        let parts = [];
-        if (rawStr.includes('+')) {
-          parts = rawStr.split('+');
-        } else if (rawStr.includes('/')) {
-          parts = rawStr.split('/');
-        } else if (rawStr.includes('-') && (rawStr.match(/-/g) || []).length >= 2) {
-          parts = rawStr.split('-');
-        }
-
-        if (parts.length >= 3) {
-          const c1 = cleanAndSplitValues(parts[0]);
-          const c2 = cleanAndSplitValues(parts[1]);
-          const c3 = cleanAndSplitValues(parts[2]);
-          if (c1.length) colors1 = c1;
-          if (c2.length) colors2 = c2;
-          if (c3.length) colors3 = c3;
-        } else {
-          const allColors = cleanAndSplitValues(rawStr);
-          if (allColors.length >= 3) {
-            colors1 = [allColors[0]];
-            colors2 = [allColors[1]];
-            colors3 = allColors.slice(2);
-          } else if (allColors.length > 0) {
-            colors1 = allColors;
-            colors2 = allColors;
-            colors3 = allColors;
-          }
-        }
-      }
+      
+      // التوزيع المضبوط والدقيق للألوان حسب طلبك
+      let colors1 = ['هافان', 'بيج', 'اسود'];
+      let colors2 = ['اسود', 'هافان', 'بيج'];
+      let colors3 = ['بني', 'دهبي', 'فضي', 'هافان', 'اسود', 'ابيض', 'بيج'];
 
       const isDeal420 = (activeItem.price == 420) || 
                         (activeItem.title && activeItem.title.includes('420')) || 
@@ -697,10 +662,17 @@
         document.getElementById('b1-title').innerText = '1. سليبر فوم عالي منقرش';
         document.getElementById('b2-title').innerText = '2. جذمة كلاسيك طبية';
         document.getElementById('b3-title').innerText = '3. سليبر واطي تايجر';
+
+        // 1. العالي: 3 ألوان (بدون بني)
+        colors1 = ['هافان', 'بيج', 'اسود'];
+        // 2. الجذمة: 3 ألوان (بدون بني وبدون كحلي + هافان)
+        colors2 = ['اسود', 'هافان', 'بيج'];
+        // 3. التايجر: البني يفضل فيه + الألوان الإضافية المطلوبة
+        colors3 = ['بني', 'دهبي', 'فضي', 'هافان', 'اسود', 'ابيض', 'بيج'];
       } else {
-        document.getElementById('b1-title').innerText = '1. القطعة الأولى';
-        document.getElementById('b2-title').innerText = '2. القطعة الثانية';
-        document.getElementById('b3-title').innerText = '3. القطعة الثالثة';
+        document.getElementById('b1-title').innerText = '1. سليبر منقرش';
+        document.getElementById('b2-title').innerText = '2. سليبر تايجر';
+        document.getElementById('b3-title').innerText = '3. سليبر شفاف';
       }
 
       b1 = { name: document.getElementById('b1-title').innerText, size: defaultSizes[0], color: colors1[0] };
