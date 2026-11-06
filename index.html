@@ -462,7 +462,6 @@
   </div>
 
   <script>
-    // رابط ملف الإكسل المرفوع على جيت هاب
     const EXCEL_FILE_URL = "متجر_RAHA_الاحترافي-v2.xlsx";
     const waNumber = "201203541255";
 
@@ -501,12 +500,12 @@
         productsData = rawData.map(row => ({
           id: String(row['معرف المنتج'] || ''),
           title: String(row['اسم المنتج'] || ''),
-          price: Number(row['السعر'] || 0),
+          price: Number(row['سعر العرض'] || row['السعر الأصلي'] || row['السعر'] || 0),
           category: String(row['القسم'] || ''),
           img: String(row['رابط الصورة'] || ''),
           desc: String(row['الوصف'] || ''),
           colorsRaw: String(row['الألوان المتاحة'] || ''),
-          onSale: row['عروض'] === 'نعم' || row['عروض'] === true
+          onSale: row['هل عليه عرض؟'] === 'نعم' || row['عروض'] === 'نعم'
         }));
 
         if (productsData.length > 0) {
