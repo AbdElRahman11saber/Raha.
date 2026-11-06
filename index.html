@@ -511,7 +511,7 @@
       if (currentFilter === 'all') {
         filtered = productsData;
       } else if (currentFilter === 'deals') {
-        filtered = productsData.filter(p => p.onSale || p.category === 'العروض' || String(p.id).includes('09') || (p.title && p.title.includes('عرض')));
+        filtered = productsData.filter(p => p.onSale || p.category === 'العروض' || String(p.id).includes('09') || String(p.id).includes('10') || (p.title && p.title.includes('عرض')));
       } else {
         filtered = productsData.filter(p => p.category === currentFilter);
       }
@@ -552,7 +552,7 @@
       document.getElementById('p-desc').innerText = activeItem.desc;
       document.getElementById('p-price').innerText = `${activeItem.price} ج.م`;
 
-      const isBundle = String(activeItem.id).includes('09') || (activeItem.title && activeItem.title.includes('عرض'));
+      const isBundle = String(activeItem.id).includes('09') || String(activeItem.id).includes('10') || (activeItem.title && activeItem.title.includes('عرض'));
 
       document.getElementById('single-controls').style.display = isBundle ? 'none' : 'block';
       document.getElementById('bundle-controls').style.display = isBundle ? 'block' : 'none';
@@ -560,8 +560,17 @@
       if (isBundle) {
         renderBundleControlsFromSheet();
       } else {
-        const sizesArr = Array.isArray(activeItem.sizes) ? activeItem.sizes : [37, 38, 39, 40, 41];
-        const colorsArr = Array.isArray(activeItem.colors) ? activeItem.colors : [activeItem.colors || 'متوفر'];
+        const sizesArr = Array.isArray(activeItem.sizes) && activeItem.sizes.length > 0 ? activeItem.sizes : [37, 38, 39, 40, 41];
+        
+        let colorsArr = ['متوفر'];
+        if (activeItem.colors) {
+          if (Array.isArray(activeItem.colors)) {
+            colorsArr = activeItem.colors;
+          } else {
+            colorsArr = String(activeItem.colors).split(/[,،]/).map(c => c.trim()).filter(Boolean);
+          }
+        }
+        if (colorsArr.length === 0) colorsArr = ['متوفر'];
 
         selectedSize = sizesArr[0];
         selectedColor = colorsArr[0];
@@ -597,9 +606,9 @@
           const parseColors = (str) => {
             const match = str.match(/\((.*?)\)/);
             if (match && match[1]) {
-              return match[1].split(',').map(s => s.trim());
+              return match[1].split(/[,،]/).map(s => s.trim()).filter(Boolean);
             }
-            return str.split(',').map(s => s.trim());
+            return str.split(/[,،]/).map(s => s.trim()).filter(Boolean);
           };
           colors1 = parseColors(parts[0]) || colors1;
           colors2 = parseColors(parts[1]) || colors2;
@@ -666,7 +675,7 @@
     }
 
     function addToCartConfirm() {
-      const isBundle = String(activeItem.id).includes('09') || (activeItem.title && activeItem.title.includes('عرض'));
+      const isBundle = String(activeItem.id).includes('09') || String(activeItem.id).includes('10') || (activeItem.title && activeItem.title.includes('عرض'));
 
       if (isBundle) {
         const specs = `[${b1.name}: مقاس ${b1.size} - لون ${b1.color}] + [${b2.name}: مقاس ${b2.size} - لون ${b2.color}] + [${b3.name}: مقاس ${b3.size} - لون ${b3.color}]`;
