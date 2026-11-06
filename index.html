@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="no-referrer">
   <title>RAHA | A Mark of Distinction</title>
+  <!-- مكتبة قراءة ملفات الإكسل SheetJS -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     :root {
       --bg: #FAF8F5;
@@ -460,7 +462,8 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx5Wou23GkVS7jpd2_CGMHV7LSQzznrnnhqJz5pRyoqNKDja5pesEScdCYm8FG2eqY4_Q/exec";
+    // رابط ملف الإكسل المرفوع على جيت هاب
+    const EXCEL_FILE_URL = "متجر_RAHA_الاحترافي-v2.xlsx";
     const waNumber = "201203541255";
 
     let productsData = [];
@@ -482,19 +485,35 @@
 
     window.addEventListener('load', () => {
       syncCartUI();
-      fetchProductsFromSheet();
+      fetchProductsFromExcel();
     });
 
-    async function fetchProductsFromSheet() {
+    async function fetchProductsFromExcel() {
       try {
-        const res = await fetch(SCRIPT_URL);
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-          productsData = data;
+        const response = await fetch(EXCEL_FILE_URL);
+        const arrayBuffer = await response.arrayBuffer();
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+        
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const rawData = XLSX.utils.sheet_to_json(worksheet);
+        
+        productsData = rawData.map(row => ({
+          id: String(row['معرف المنتج'] || ''),
+          title: String(row['اسم المنتج'] || ''),
+          price: Number(row['السعر'] || 0),
+          category: String(row['القسم'] || ''),
+          img: String(row['رابط الصورة'] || ''),
+          desc: String(row['الوصف'] || ''),
+          colorsRaw: String(row['الألوان المتاحة'] || ''),
+          onSale: row['عروض'] === 'نعم' || row['عروض'] === true
+        }));
+
+        if (productsData.length > 0) {
           renderCatalog();
         }
       } catch (err) {
-        console.log("خطأ في جلب بيانات الشيت:", err);
+        console.log("خطأ في قراءة ملف الإكسل:", err);
       } finally {
         const splash = document.getElementById('splash');
         if (splash) {
@@ -560,15 +579,10 @@
       if (isBundle) {
         renderBundleControlsFromSheet();
       } else {
-        const sizesArr = Array.isArray(activeItem.sizes) && activeItem.sizes.length > 0 ? activeItem.sizes : [37, 38, 39, 40, 41];
-        
+        const sizesArr = [37, 38, 39, 40, 41];
         let colorsArr = ['متوفرة'];
-        if (activeItem.colors) {
-          if (Array.isArray(activeItem.colors)) {
-            colorsArr = activeItem.colors;
-          } else {
-            colorsArr = String(activeItem.colors).split(/[,،]/).map(c => c.trim()).filter(Boolean);
-          }
+        if (activeItem.colorsRaw) {
+          colorsArr = activeItem.colorsRaw.split(/[,،]/).map(c => c.trim()).filter(Boolean);
         }
         if (colorsArr.length === 0) colorsArr = ['متوفرة'];
 
@@ -602,7 +616,6 @@
 
       const isDeal420 = (activeItem.price == 420) || (activeItem.title && activeItem.title.includes('420')) || (activeItem.desc && activeItem.desc.includes('جذمة'));
 
-      // إظهار التلات صناديق بوضوح تام ودعم الألوان المخصصة لكل قطعة
       document.getElementById('box-1').style.display = 'block';
       document.getElementById('box-2').style.display = 'block';
       document.getElementById('box-3').style.display = 'block';
@@ -757,7 +770,7 @@
       document.getElementById(id).classList.remove('active');
     }
 
-    async function handleOrderSubmit(e) {
+    function handleOrderSubmit(e) {
       e.preventDefault();
       if (cart.length === 0) return alert('السلة فارغة!');
 
@@ -765,31 +778,6 @@
       const phone = document.getElementById('cust-phone').value;
       const address = document.getElementById('cust-address').value;
       const total = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
-
-      const submitBtn = document.getElementById('submit-btn');
-      submitBtn.innerText = 'جاري تسجيل طلبك...';
-      submitBtn.disabled = true;
-
-      const itemsSummary = cart.map(i => `${i.title} (${i.qty})`).join('، ');
-      const specsSummary = cart.map(i => `${i.title}: ${i.color}`).join(' | ');
-
-      try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: name,
-            phone: phone,
-            address: address,
-            itemsSummary: itemsSummary,
-            specsSummary: specsSummary,
-            total: total
-          })
-        });
-      } catch (err) {
-        console.log("خطأ تسجيل الطلب:", err);
-      }
 
       let msg = `طلب جديد من متجر RAHA:\nالاسم: ${name}\nالهاتف: ${phone}\nالعنوان: ${address}\n\nتفاصيل المنتجات:\n`;
       cart.forEach(i => {
@@ -802,8 +790,6 @@
 
       cart = [];
       saveCartState();
-      submitBtn.innerText = 'إتمام الطلب عبر واتساب';
-      submitBtn.disabled = false;
       closeDrawer('cart-drawer');
     }
   </script>
