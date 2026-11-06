@@ -236,7 +236,7 @@
     .options-title {
       font-size: 0.8rem;
       color: var(--text-muted);
-      margin: 12px 0 6px;
+      margin: 10px 0 6px;
       font-weight: 600;
     }
 
@@ -246,7 +246,7 @@
       flex-wrap: wrap;
     }
 
-    .size-box, .color-chip {
+    .chip-btn {
       border: 1px solid var(--border);
       padding: 6px 12px;
       border-radius: 6px;
@@ -254,26 +254,30 @@
       font-weight: 600;
       cursor: pointer;
       background: var(--bg);
+      color: var(--text-main);
+      user-select: none;
     }
 
-    .size-box.selected, .color-chip.selected {
+    .chip-btn.selected {
       background: var(--text-main);
-      color: var(--bg);
+      color: #FFFFFF;
       border-color: var(--text-main);
     }
 
-    .bundle-section {
-      background: #FAF6F0;
+    .bundle-box {
+      background: #FDFBF7;
       border: 1px solid var(--border);
+      border-radius: 10px;
       padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
-    .bundle-header {
+    .bundle-box-title {
       font-size: 0.88rem;
       font-weight: 700;
       color: var(--gold-dark);
+      border-bottom: 1px dashed var(--border);
+      padding-bottom: 6px;
       margin-bottom: 6px;
     }
 
@@ -331,15 +335,13 @@
     <button class="filter-btn active" onclick="applyFilter('all', this)">جميع المنتجات</button>
     <button class="filter-btn" onclick="applyFilter('deals', this)">العروض</button>
     <button class="filter-btn" onclick="applyFilter('أحذية وسليبرات', this)">أحذية وسليبرات</button>
-    <button class="filter-btn" onclick="applyFilter('ملابس', this)">ملابس</button>
-    <button class="filter-btn" onclick="applyFilter('إكسسوارات', this)">إكسسوارات</button>
   </div>
 
   <main class="container">
     <div class="catalog-grid" id="catalog-container"></div>
   </main>
 
-  <!-- Product & Deal Drawer -->
+  <!-- Product Drawer -->
   <div class="drawer-overlay" id="product-drawer">
     <div class="drawer-sheet">
       <div class="sheet-header">
@@ -350,11 +352,11 @@
       <img id="p-image" src="" style="width: 100%; height: 210px; object-fit: cover; border-radius: 8px;">
       <p id="p-desc" style="color: var(--text-muted); font-size: 0.85rem; margin: 12px 0; line-height: 1.4;"></p>
       
-      <div class="price-row" style="margin-bottom: 10px;">
-        <span id="p-price" style="font-size: 1.2rem; font-weight: 700;"></span>
+      <div class="price-row" style="margin-bottom: 12px;">
+        <span id="p-price" style="font-size: 1.25rem; font-weight: 800;"></span>
       </div>
 
-      <!-- Single Product Controls -->
+      <!-- خيارات منتج عادي فردي -->
       <div id="single-controls">
         <div class="options-title">المقاس:</div>
         <div class="options-row" id="p-sizes"></div>
@@ -362,29 +364,29 @@
         <div class="options-row" id="p-colors"></div>
       </div>
 
-      <!-- Deal 3 Bundle Controls -->
+      <!-- خيارات عرض الـ 3 المستقلة لكل جوز -->
       <div id="bundle-controls" style="display: none;">
-        <!-- Item 1: المنقرش -->
-        <div class="bundle-section">
-          <div class="bundle-header">1. السليبر المنقرش</div>
+        <!-- 1. المنقرش -->
+        <div class="bundle-box">
+          <div class="bundle-box-title">1. السليبر المنقرش</div>
           <div class="options-title">المقاس:</div>
           <div class="options-row" id="b1-sizes"></div>
           <div class="options-title">اللون:</div>
           <div class="options-row" id="b1-colors"></div>
         </div>
 
-        <!-- Item 2: التايجر -->
-        <div class="bundle-section">
-          <div class="bundle-header">2. السليبر التايجر</div>
+        <!-- 2. التايجر -->
+        <div class="bundle-box">
+          <div class="bundle-box-title">2. السليبر التايجر</div>
           <div class="options-title">المقاس:</div>
           <div class="options-row" id="b2-sizes"></div>
           <div class="options-title">اللون:</div>
           <div class="options-row" id="b2-colors"></div>
         </div>
 
-        <!-- Item 3: المجدول -->
-        <div class="bundle-section">
-          <div class="bundle-header">3. السليبر المجدول</div>
+        <!-- 3. الشفاف -->
+        <div class="bundle-box">
+          <div class="bundle-box-title">3. السليبر الشفاف</div>
           <div class="options-title">المقاس:</div>
           <div class="options-row" id="b3-sizes"></div>
           <div class="options-title">اللون:</div>
@@ -420,7 +422,7 @@
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxDIc69z2S_KD2C2N_ZQGMfzPokdTGChvABDI7ymkQPo3zGJT5k1HICGflMy_vmWeJF9g/exec";
-    const waNumber = "201203541255"; // استبدل برقم هاتفك المسجل
+    const waNumber = "201203541255";
 
     const baseProducts = [
       { id: "RAHA-01", title: "سليبر واطي مخطط", category: "أحذية وسليبرات", price: 145, onSale: false, desc: "تصميم أنيق ونعل مريح", img: "https://lh3.googleusercontent.com/d/1bf6x_5OZAU8T7fpvXqzumExtla6t13gi", sizes: [37, 38, 39, 40, 41], colors: ["أسود مذهب"] },
@@ -429,9 +431,9 @@
       { id: "RAHA-04", title: "جذمة", category: "أحذية وسليبرات", price: 185, onSale: false, desc: "حذاء فلات طبي مريح", img: "https://lh3.googleusercontent.com/d/1GyOqvo4mPVna7IaGY1Heaz1GLLQUYEGG", sizes: [37, 38, 39, 40, 41], colors: ["أسود"] },
       { id: "RAHA-05", title: "سليبر عالي منقرش", category: "أحذية وسليبرات", price: 165, onSale: false, desc: "شريط تريكو ونعل خفيف", img: "https://lh3.googleusercontent.com/d/1PRWzi8AYWz3RzbLLDNypkP7b2LRQ_awY", sizes: [37, 38, 39, 40, 41], colors: ["بني هافان"] },
       { id: "RAHA-06", title: "سليبر عالي نصين", category: "أحذية وسليبرات", price: 165, onSale: false, desc: "شريط ملون ناعم", img: "https://lh3.googleusercontent.com/d/1eKCfyUUXSz_k6seF3owWsmOX_YBpfwLW", sizes: [37, 38, 39, 40, 41], colors: ["متعدد"] },
-      { id: "RAHA-07", title: "سليبر واطي شفاف", category: "أحذية وسليبرات", price: 145, onSale: false, desc: "دانتيل روز مفرغ راقي", img: "https://lh3.googleusercontent.com/d/1xX7rNoc3LL5u28zX63cyOq_ZERDdAwml", sizes: [37, 38, 39, 40, 41], colors: ["روز"] },
+      { id: "RAHA-07", title: "سليبر واطي شفاف", category: "أحذية وسليبرات", price: 145, onSale: false, desc: "دانتيل روز مفرغ راقي", img: "https://lh3.googleusercontent.com/d/1xX7rNoc3LL5u28zX63cyOq_ZERDdAwml", sizes: [37, 38, 39, 40, 41], colors: ["اسود", "بيج", "هافان", "كشمير"] },
       { id: "RAHA-08", title: "سليبر واطي تايجر", category: "أحذية وسليبرات", price: 145, onSale: false, desc: "نقشة زيبرا عصرية", img: "https://lh3.googleusercontent.com/d/1THl7Uyou0BmM8eiK9ef0513TYmeLOwfz", sizes: [37, 38, 39, 40, 41], colors: ["اسود", "ابيض", "بني", "فضي", "بيج"] },
-      { id: "RAHA-09", title: "عرض الـ 3 (سليبرات واطية)", category: "العروض", price: 360, onSale: true, desc: "عرض خاص: 3 سليبرات واطية من اختيارك والشحن مجاناً لجميع المحافظات!", img: "https://lh3.googleusercontent.com/d/11nzQ_9_FpRU0MJzXSkcZAGWeVEwlsfsc", sizes: [37, 38, 39, 40, 41], colors: [] }
+      { id: "RAHA-09", title: "عرض الـ 3 (سليبرات واطية)", category: "العروض", price: 360, onSale: true, desc: "عرض خاص: 3 سليبرات واطية من اختيارك (منقرش، تايجر، شفاف) والشحن مجاناً لجميع المحافظات!", img: "https://lh3.googleusercontent.com/d/11nzQ_9_FpRU0MJzXSkcZAGWeVEwlsfsc", sizes: [37, 38, 39, 40, 41], colors: [] }
     ];
 
     let productsData = [...baseProducts];
@@ -440,7 +442,7 @@
     let selectedSize = null;
     let selectedColor = null;
 
-    // Bundle selection states
+    // اختيارات كل جوز في العرض
     let b1 = { size: '37', color: 'اسود' };
     let b2 = { size: '37', color: 'اسود' };
     let b3 = { size: '37', color: 'اسود' };
@@ -476,7 +478,7 @@
           renderCatalog();
         }
       } catch (err) {
-        console.log("استمرار العمل بالبيانات المعروضة:", err);
+        console.log("استمرار العمل بالبيانات المحلية:", err);
       }
     }
 
@@ -487,7 +489,7 @@
       if (currentFilter === 'all') {
         filtered = productsData;
       } else if (currentFilter === 'deals') {
-        filtered = productsData.filter(p => p.onSale || p.category === 'العروض' || p.id === 'RAHA-09');
+        filtered = productsData.filter(p => p.onSale || p.category === 'العروض' || String(p.id).includes('09') || (p.title && p.title.includes('عرض')));
       } else {
         filtered = productsData.filter(p => p.category === currentFilter);
       }
@@ -520,88 +522,88 @@
     }
 
     function openProductSheet(id) {
-      activeItem = productsData.find(p => p.id === id);
+      activeItem = productsData.find(p => String(p.id).trim() === String(id).trim());
+      if (!activeItem) return;
+
       document.getElementById('p-title').innerText = activeItem.title;
       document.getElementById('p-image').src = activeItem.img;
       document.getElementById('p-desc').innerText = activeItem.desc;
       document.getElementById('p-price').innerText = `${activeItem.price} ج.م`;
 
-      const isBundle = (activeItem.id === 'RAHA-09');
+      const isBundle = String(activeItem.id).includes('09') || activeItem.title.includes('عرض الـ 3') || activeItem.title.includes('عرض ال 3');
+
       document.getElementById('single-controls').style.display = isBundle ? 'none' : 'block';
       document.getElementById('bundle-controls').style.display = isBundle ? 'block' : 'none';
 
       if (isBundle) {
         renderBundleControls();
       } else {
-        selectedSize = activeItem.sizes && activeItem.sizes.length ? activeItem.sizes[0] : '37';
-        selectedColor = activeItem.colors && activeItem.colors.length ? activeItem.colors[0] : 'اللون المعروض';
+        selectedSize = (activeItem.sizes && activeItem.sizes.length) ? activeItem.sizes[0] : '37';
+        selectedColor = (activeItem.colors && activeItem.colors.length) ? activeItem.colors[0] : 'اللون المعروض';
 
         document.getElementById('p-sizes').innerHTML = (activeItem.sizes || []).map((s, idx) => `
-          <div class="size-box ${idx === 0 ? 'selected' : ''}" onclick="selectSingleSize(this, '${s}')">${s}</div>
+          <div class="chip-btn ${idx === 0 ? 'selected' : ''}" onclick="selectSingleOption('p-sizes', this, '${s}', 'size')">${s}</div>
         `).join('');
 
         document.getElementById('p-colors').innerHTML = (activeItem.colors || []).map((c, idx) => `
-          <div class="color-chip ${idx === 0 ? 'selected' : ''}" onclick="selectSingleColor(this, '${c}')">${c}</div>
+          <div class="chip-btn ${idx === 0 ? 'selected' : ''}" onclick="selectSingleOption('p-colors', this, '${c}', 'color')">${c}</div>
         `).join('');
       }
 
       document.getElementById('product-drawer').classList.add('active');
     }
 
+    function selectSingleOption(containerId, elem, val, type) {
+      document.querySelectorAll(`#${containerId} .chip-btn`).forEach(el => el.classList.remove('selected'));
+      elem.classList.add('selected');
+      if (type === 'size') selectedSize = val;
+      if (type === 'color') selectedColor = val;
+    }
+
     function renderBundleControls() {
       const sizes = ['37', '38', '39', '40', '41'];
       const c1 = ['اسود', 'بيج', 'هافان'];
       const c2 = ['اسود', 'ابيض', 'بني', 'فضي', 'بيج'];
-      const c3 = ['اسود', 'اخضر', 'هافان', 'بيج', 'ازرق'];
+      const c3 = ['اسود', 'بيج', 'هافان', 'كشمير'];
 
       b1 = { size: '37', color: c1[0] };
       b2 = { size: '37', color: c2[0] };
       b3 = { size: '37', color: c3[0] };
 
-      renderRowHtml('b1-sizes', sizes, b1.size, (val) => b1.size = val);
-      renderRowHtml('b1-colors', c1, b1.color, (val) => b1.color = val);
+      renderChipGroup('b1-sizes', sizes, b1.size, val => b1.size = val);
+      renderChipGroup('b1-colors', c1, b1.color, val => b1.color = val);
 
-      renderRowHtml('b2-sizes', sizes, b2.size, (val) => b2.size = val);
-      renderRowHtml('b2-colors', c2, b2.color, (val) => b2.color = val);
+      renderChipGroup('b2-sizes', sizes, b2.size, val => b2.size = val);
+      renderChipGroup('b2-colors', c2, b2.color, val => b2.color = val);
 
-      renderRowHtml('b3-sizes', sizes, b3.size, (val) => b3.size = val);
-      renderRowHtml('b3-colors', c3, b3.color, (val) => b3.color = val);
+      renderChipGroup('b3-sizes', sizes, b3.size, val => b3.size = val);
+      renderChipGroup('b3-colors', c3, b3.color, val => b3.color = val);
     }
 
-    function renderRowHtml(containerId, list, currentVal, onChange) {
-      const el = document.getElementById(containerId);
-      el.innerHTML = list.map(item => `
-        <div class="size-box ${item === currentVal ? 'selected' : ''}" onclick="handleChipClick(this, '${containerId}', '${item}')">${item}</div>
+    function renderChipGroup(containerId, list, defaultVal, onSelect) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = list.map(item => `
+        <div class="chip-btn ${item === defaultVal ? 'selected' : ''}" onclick="updateChipGroup(this, '${containerId}', '${item}')">${item}</div>
       `).join('');
-      el._onChange = onChange;
+      container._onSelect = onSelect;
     }
 
-    function handleChipClick(elem, containerId, val) {
+    function updateChipGroup(elem, containerId, val) {
       const parent = document.getElementById(containerId);
-      parent.querySelectorAll('.size-box').forEach(x => x.classList.remove('selected'));
+      parent.querySelectorAll('.chip-btn').forEach(c => c.classList.remove('selected'));
       elem.classList.add('selected');
-      if (parent._onChange) parent._onChange(val);
-    }
-
-    function selectSingleSize(elem, val) {
-      document.querySelectorAll('#p-sizes .size-box').forEach(el => el.classList.remove('selected'));
-      elem.classList.add('selected');
-      selectedSize = val;
-    }
-
-    function selectSingleColor(elem, val) {
-      document.querySelectorAll('#p-colors .color-chip').forEach(el => el.classList.remove('selected'));
-      elem.classList.add('selected');
-      selectedColor = val;
+      if (parent._onSelect) parent._onSelect(val);
     }
 
     function addToCartConfirm() {
-      if (activeItem.id === 'RAHA-09') {
-        const specs = `[منقرش: مقاس ${b1.size} - لون ${b1.color}] + [تايجر: مقاس ${b2.size} - لون ${b2.color}] + [مجدول: مقاس ${b3.size} - لون ${b3.color}]`;
-        const itemKey = `RAHA-09-${Date.now()}`;
+      const isBundle = String(activeItem.id).includes('09') || activeItem.title.includes('عرض الـ 3') || activeItem.title.includes('عرض ال 3');
+
+      if (isBundle) {
+        const specs = `[منقرش: مقاس ${b1.size} - لون ${b1.color}] + [تايجر: مقاس ${b2.size} - لون ${b2.color}] + [شفاف: مقاس ${b3.size} - لون ${b3.color}]`;
+        const itemKey = `BUNDLE-${Date.now()}`;
         cart.push({
           key: itemKey,
-          id: 'RAHA-09',
+          id: activeItem.id,
           title: 'عرض الـ 3 (سليبرات واطية)',
           price: 360,
           size: '3 قطع',
@@ -655,8 +657,8 @@
         return `
           <div class="cart-line">
             <div style="max-width: 85%;">
-              <div style="font-weight:600; font-size:0.9rem;">${item.title}</div>
-              <div style="font-size:0.75rem; color:var(--text-muted); line-height: 1.4;">${item.color}</div>
+              <div style="font-weight:700; font-size:0.9rem;">${item.title}</div>
+              <div style="font-size:0.75rem; color:var(--text-muted); line-height: 1.4; margin-top:2px;">${item.color}</div>
               <div style="font-size:0.85rem; font-weight:700; margin-top: 3px;">${item.price} ج.م × ${item.qty}</div>
             </div>
             <button onclick="deleteItem(${index})" style="background:none; border:none; color:#c0392b; font-size:1.1rem; cursor:pointer;">✕</button>
@@ -719,7 +721,7 @@
       cart.forEach(i => {
         msg += `- ${i.title} × ${i.qty}\n  ${i.color}\n`;
       });
-      msg += `\nالإجمالي: ${total} ج.م (الشحن مجاناً للعروض)`;
+      msg += `\nالإجمالي: ${total} ج.م (شامل مصاريف الشحن)`;
 
       const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
       window.open(waUrl, '_blank');
