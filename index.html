@@ -610,8 +610,8 @@
     function renderBundleControlsFromSheet() {
       const sizes = ['37', '38', '39', '40', '41'];
       let colors1 = ['اسود', 'بيج', 'هافان'];
-      let colors2 = ['اسود', 'ابيض', 'بني', 'فضي', 'بيج'];
-      let colors3 = ['اسود', 'بيج', 'هافان', 'كشمير'];
+      let colors2 = ['اسود', 'بيج', 'هافان'];
+      let colors3 = ['اسود', 'ابيض', 'بني', 'فضي', 'بيج'];
 
       const isDeal420 = (activeItem.price == 420) || (activeItem.title && activeItem.title.includes('420')) || (activeItem.desc && activeItem.desc.includes('جذمة'));
 
@@ -623,10 +623,6 @@
         document.getElementById('b1-title').innerText = '1. سليبر فوم عالي منقرش';
         document.getElementById('b2-title').innerText = '2. جذمة كلاسيك طبية';
         document.getElementById('b3-title').innerText = '3. سليبر واطي تايجر';
-        
-        colors1 = ['بني هافان'];
-        colors2 = ['أسود'];
-        colors3 = ['اسود', 'ابيض', 'بني', 'فضي', 'بيج'];
       } else {
         document.getElementById('b1-title').innerText = '1. السليبر المنقرش';
         document.getElementById('b2-title').innerText = '2. السليبر التايجر';
