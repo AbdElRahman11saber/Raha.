@@ -320,7 +320,6 @@
       outline: none;
     }
 
-    /* نافذة تكبير الصورة */
     #image-lightbox {
       display: none;
       position: fixed;
@@ -383,13 +382,11 @@
     <div class="catalog-grid" id="catalog-container"></div>
   </main>
 
-  <!-- نافذة تكبير الصورة (Lightbox) -->
   <div id="image-lightbox" onclick="closeLightbox()">
     <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
     <img id="lightbox-img" src="" alt="تكبير الصورة">
   </div>
 
-  <!-- تفاصيل المنتج / العرض -->
   <div class="drawer-overlay" id="product-drawer">
     <div class="drawer-sheet">
       <div class="sheet-header">
@@ -397,7 +394,6 @@
         <button class="close-icon" onclick="closeDrawer('product-drawer')">&times;</button>
       </div>
 
-      <!-- الصورة تفتح في وضع التكبير عند الضغط عليها -->
       <img id="p-image" src="" style="width: 100%; height: 210px; object-fit: cover; border-radius: 8px; cursor: pointer;" onclick="openLightbox(this.src)">
       <div class="img-zoom-tip">🔍 اضغط على الصورة لتكبيرها</div>
 
@@ -407,7 +403,6 @@
         <span id="p-price" style="font-size: 1.25rem; font-weight: 800;"></span>
       </div>
 
-      <!-- خيارات منتج عادي فردي -->
       <div id="single-controls">
         <div class="options-title">المقاس:</div>
         <div class="options-row" id="p-sizes"></div>
@@ -415,9 +410,7 @@
         <div class="options-row" id="p-colors"></div>
       </div>
 
-      <!-- خيارات عرض الـ 3 (المنقرش - التايجر - الشفاف) -->
       <div id="bundle-controls" style="display: none;">
-        <!-- 1. المنقرش -->
         <div class="bundle-box">
           <div class="bundle-box-title">1. السليبر المنقرش</div>
           <div class="options-title">المقاس:</div>
@@ -426,7 +419,6 @@
           <div class="options-row" id="b1-colors"></div>
         </div>
 
-        <!-- 2. التايجر -->
         <div class="bundle-box">
           <div class="bundle-box-title">2. السليبر التايجر</div>
           <div class="options-title">المقاس:</div>
@@ -435,7 +427,6 @@
           <div class="options-row" id="b2-colors"></div>
         </div>
 
-        <!-- 3. الشفاف (بديل المجدول) -->
         <div class="bundle-box">
           <div class="bundle-box-title">3. السليبر الشفاف</div>
           <div class="options-title">المقاس:</div>
@@ -449,7 +440,6 @@
     </div>
   </div>
 
-  <!-- السلة -->
   <div class="drawer-overlay" id="cart-drawer">
     <div class="drawer-sheet">
       <div class="sheet-header">
@@ -493,7 +483,6 @@
     let selectedSize = null;
     let selectedColor = null;
 
-    // اختيارات كل جوز في العرض
     let b1 = { size: '37', color: 'اسود' };
     let b2 = { size: '37', color: 'اسود' };
     let b3 = { size: '37', color: 'اسود' };
