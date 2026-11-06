@@ -14,6 +14,7 @@
       --gold: #C5A880;
       --gold-dark: #A3845B;
       --border: #EADBCC;
+      --danger: #c0392b;
     }
 
     * {
@@ -40,7 +41,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      transition: opacity 0.8s ease, visibility 0.8s;
+      transition: opacity 0.6s ease, visibility 0.6s;
     }
 
     .splash-logo {
@@ -48,12 +49,12 @@
       letter-spacing: 6px;
       font-weight: 700;
       color: var(--text-main);
-      animation: splashAppear 1.2s forwards ease-out;
+      animation: splashAppear 1s forwards ease-out;
     }
 
     .splash-star {
       color: var(--gold);
-      font-size: 1rem;
+      font-size: 1.1rem;
       margin: 6px 0;
     }
 
@@ -65,14 +66,14 @@
     }
 
     @keyframes splashAppear {
-      from { opacity: 0; transform: scale(0.9); }
+      from { opacity: 0; transform: scale(0.92); }
       to { opacity: 1; transform: scale(1); }
     }
 
     header {
       background: rgba(250, 248, 245, 0.95);
       backdrop-filter: blur(8px);
-      padding: 16px 20px;
+      padding: 14px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -83,7 +84,7 @@
     }
 
     .brand-title {
-      font-size: 1.3rem;
+      font-size: 1.35rem;
       font-weight: 800;
       letter-spacing: 3px;
       color: var(--text-main);
@@ -100,11 +101,19 @@
       background: transparent;
       border: 1px solid var(--border);
       color: var(--text-main);
-      padding: 7px 14px;
+      padding: 7px 16px;
       border-radius: 20px;
       font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .cart-btn:active {
+      transform: scale(0.96);
     }
 
     .filters-wrapper {
@@ -126,6 +135,7 @@
       font-weight: 600;
       white-space: nowrap;
       cursor: pointer;
+      transition: all 0.2s ease;
     }
 
     .filter-btn.active {
@@ -149,17 +159,22 @@
     .item-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 12px;
       overflow: hidden;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       position: relative;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .item-card:active {
+      transform: scale(0.98);
     }
 
     .card-thumb {
       width: 100%;
-      height: 160px;
+      height: 165px;
       background: #ECE6DD;
       position: relative;
     }
@@ -171,16 +186,17 @@
     }
 
     .card-body {
-      padding: 10px;
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
       flex-grow: 1;
     }
 
     .card-title {
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       font-weight: 700;
       margin-bottom: 6px;
+      line-height: 1.35;
     }
 
     .price-row {
@@ -200,7 +216,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(26, 26, 26, 0.5);
+      background: rgba(26, 26, 26, 0.55);
       backdrop-filter: blur(4px);
       z-index: 1000;
       justify-content: center;
@@ -214,31 +230,38 @@
       border-radius: 20px 20px 0 0;
       width: 100%;
       max-width: 600px;
-      padding: 20px;
-      max-height: 85vh;
+      padding: 20px 18px 24px;
+      max-height: 88vh;
       overflow-y: auto;
+      animation: sheetUp 0.25s ease-out;
+    }
+
+    @keyframes sheetUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
     }
 
     .sheet-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     .close-icon {
       background: none;
       border: none;
-      font-size: 1.6rem;
+      font-size: 1.7rem;
       cursor: pointer;
+      color: var(--text-muted);
+      line-height: 1;
     }
 
     .img-zoom-tip {
       font-size: 0.72rem;
       color: var(--gold-dark);
       text-align: center;
-      margin-top: 4px;
-      margin-bottom: 10px;
+      margin: 6px 0 10px;
     }
 
     .options-title {
@@ -250,32 +273,34 @@
 
     .options-row {
       display: flex;
-      gap: 6px;
+      gap: 8px;
       flex-wrap: wrap;
     }
 
     .chip-btn {
       border: 1px solid var(--border);
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 0.82rem;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 0.84rem;
       font-weight: 600;
       cursor: pointer;
       background: var(--bg);
       color: var(--text-main);
       user-select: none;
+      transition: all 0.15s ease;
     }
 
     .chip-btn.selected {
       background: var(--text-main);
       color: #FFFFFF;
       border-color: var(--text-main);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
     }
 
     .bundle-box {
-      background: #FDFBF7;
+      background: #FAF8F5;
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 12px;
       margin-bottom: 12px;
     }
@@ -286,7 +311,7 @@
       color: var(--gold-dark);
       border-bottom: 1px dashed var(--border);
       padding-bottom: 6px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .primary-btn {
@@ -294,37 +319,47 @@
       background: var(--text-main);
       color: var(--bg);
       border: none;
-      padding: 13px;
-      border-radius: 8px;
+      padding: 14px;
+      border-radius: 10px;
       font-weight: 700;
       font-size: 0.95rem;
       margin-top: 16px;
       cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .primary-btn:active {
+      opacity: 0.9;
     }
 
     .cart-line {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       padding: 12px 0;
       border-bottom: 1px solid var(--border);
     }
 
     .text-input {
       width: 100%;
-      padding: 11px;
+      padding: 12px;
       background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 6px;
-      margin-top: 8px;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-size: 0.88rem;
       outline: none;
+    }
+
+    .text-input:focus {
+      border-color: var(--gold);
     }
 
     #image-lightbox {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.9);
+      background: rgba(0, 0, 0, 0.92);
       z-index: 10000;
       justify-content: center;
       align-items: center;
@@ -335,15 +370,15 @@
 
     #image-lightbox img {
       max-width: 95%;
-      max-height: 90vh;
+      max-height: 85vh;
       object-fit: contain;
       border-radius: 8px;
     }
 
     .lightbox-close {
       position: absolute;
-      top: 16px;
-      right: 20px;
+      top: 20px;
+      right: 24px;
       color: #FFFFFF;
       font-size: 2rem;
       background: none;
@@ -366,7 +401,7 @@
       <div class="brand-tagline">A Mark of Distinction</div>
     </div>
     <button class="cart-btn" onclick="openCart()">
-      السلة (<span id="cart-count">0</span>)
+      🛒 السلة (<span id="cart-count">0</span>)
     </button>
   </header>
 
@@ -380,34 +415,38 @@
     <div class="catalog-grid" id="catalog-container"></div>
   </main>
 
+  <!-- Lightbox -->
   <div id="image-lightbox" onclick="closeLightbox()">
     <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
     <img id="lightbox-img" src="" alt="تكبير الصورة">
   </div>
 
+  <!-- Product Modal Drawer -->
   <div class="drawer-overlay" id="product-drawer">
     <div class="drawer-sheet">
       <div class="sheet-header">
-        <h3 id="p-title"></h3>
+        <h3 id="p-title" style="font-size: 1.05rem;"></h3>
         <button class="close-icon" onclick="closeDrawer('product-drawer')">&times;</button>
       </div>
 
-      <img id="p-image" src="" style="width: 100%; height: 210px; object-fit: cover; border-radius: 8px; cursor: pointer;" onclick="openLightbox(this.src)">
-      <div class="img-zoom-tip">🔍 اضغط على الصورة لتكبيرها</div>
+      <img id="p-image" src="" style="width: 100%; height: 220px; object-fit: cover; border-radius: 10px; cursor: pointer;" onclick="openLightbox(this.src)">
+      <div class="img-zoom-tip">🔍 اضغط على الصورة للتكبير</div>
 
-      <p id="p-desc" style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 12px; line-height: 1.4;"></p>
+      <p id="p-desc" style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 12px; line-height: 1.5;"></p>
       
-      <div class="price-row" style="margin-bottom: 12px;">
-        <span id="p-price" style="font-size: 1.25rem; font-weight: 800;"></span>
+      <div class="price-row" style="margin-bottom: 14px;">
+        <span id="p-price" style="font-size: 1.3rem; font-weight: 800; color: var(--gold-dark);"></span>
       </div>
 
+      <!-- أدوات اختيار المنتج الفردي -->
       <div id="single-controls">
-        <div class="options-title">المقاس:</div>
+        <div class="options-title">المقاس المتاح:</div>
         <div class="options-row" id="p-sizes"></div>
-        <div class="options-title">اللون:</div>
+        <div class="options-title">اللون المتاح:</div>
         <div class="options-row" id="p-colors"></div>
       </div>
 
+      <!-- أدوات اختيار عروض الـ 3 قطع -->
       <div id="bundle-controls" style="display: none;">
         <div class="bundle-box">
           <div class="bundle-box-title" id="b1-title">القطعة الأولى</div>
@@ -438,23 +477,24 @@
     </div>
   </div>
 
+  <!-- Cart Drawer -->
   <div class="drawer-overlay" id="cart-drawer">
     <div class="drawer-sheet">
       <div class="sheet-header">
-        <h3>سلة الطلبات</h3>
+        <h3>سلة المشتريات</h3>
         <button class="close-icon" onclick="closeDrawer('cart-drawer')">&times;</button>
       </div>
       <div id="cart-list"></div>
-      <div style="display:flex; justify-content:space-between; margin-top:14px; font-weight:700;">
-        <span>الإجمالي:</span>
-        <span id="cart-total-val">0 ج.م</span>
+      <div style="display:flex; justify-content:space-between; margin-top:16px; padding-top: 10px; border-top: 1px dashed var(--border); font-weight:700;">
+        <span>الإجمالي النهائي:</span>
+        <span id="cart-total-val" style="color: var(--gold-dark); font-size: 1.15rem;">0 ج.م</span>
       </div>
 
-      <form onsubmit="handleOrderSubmit(event)" style="margin-top: 18px;">
+      <form onsubmit="handleOrderSubmit(event)" style="margin-top: 16px;">
         <input type="text" id="cust-name" class="text-input" placeholder="الاسم بالكامل" required>
         <input type="tel" id="cust-phone" class="text-input" placeholder="رقم الهاتف (واتساب)" required>
         <textarea id="cust-address" class="text-input" rows="2" placeholder="العنوان بالتفصيل والمحافظة" required></textarea>
-        <button type="submit" id="submit-btn" class="primary-btn" style="background: var(--gold-dark);">إتمام الطلب عبر واتساب</button>
+        <button type="submit" id="submit-btn" class="primary-btn" style="background: var(--gold-dark); margin-top: 12px;">إتمام الطلب عبر واتساب</button>
       </form>
     </div>
   </div>
@@ -494,12 +534,12 @@
           renderCatalog();
         }
       } catch (err) {
-        console.log("خطأ في جلب بيانات الشيت:", err);
+        console.error("خطأ في جلب بيانات الشيت:", err);
       } finally {
         const splash = document.getElementById('splash');
         if (splash) {
           splash.style.opacity = '0';
-          setTimeout(() => splash.style.visibility = 'hidden', 800);
+          setTimeout(() => splash.style.visibility = 'hidden', 600);
         }
       }
     }
@@ -517,7 +557,7 @@
       }
 
       if (filtered.length === 0) {
-        container.innerHTML = `<div style="grid-column: span 2; text-align:center; padding: 40px; color: var(--text-muted);">لا توجد منتجات في هذا القسم حالياً.</div>`;
+        container.innerHTML = `<div style="grid-column: span 2; text-align:center; padding: 40px; color: var(--text-muted);">لا توجد منتجات متوفرة حالياً.</div>`;
         return;
       }
 
@@ -543,16 +583,31 @@
       renderCatalog();
     }
 
+    // دالة لتنظيف وفصل الألوان والمقاسات من أي نصوص أو مصفوفات مركبة
+    function cleanAndSplitValues(val) {
+      if (!val) return [];
+      if (Array.isArray(val)) {
+        return val.flatMap(v => cleanAndSplitValues(v));
+      }
+      return String(val)
+        .replace(/[\[\]\(\)]/g, ' ')
+        .split(/[,،\-\/\n]+/)
+        .map(s => s.trim())
+        .filter(Boolean);
+    }
+
     function openProductSheet(id) {
       activeItem = productsData.find(p => String(p.id).trim() === String(id).trim());
       if (!activeItem) return;
 
-      document.getElementById('p-title').innerText = activeItem.title;
-      document.getElementById('p-image').src = activeItem.img;
-      document.getElementById('p-desc').innerText = activeItem.desc;
+      document.getElementById('p-title').innerText = activeItem.title || '';
+      document.getElementById('p-image').src = activeItem.img || '';
+      document.getElementById('p-desc').innerText = activeItem.desc || '';
       document.getElementById('p-price').innerText = `${activeItem.price} ج.م`;
 
-      const isBundle = String(activeItem.id).includes('09') || String(activeItem.id).includes('10') || (activeItem.title && activeItem.title.includes('عرض'));
+      const isBundle = String(activeItem.id).includes('09') || 
+                       String(activeItem.id).includes('10') || 
+                       (activeItem.title && activeItem.title.includes('عرض'));
 
       document.getElementById('single-controls').style.display = isBundle ? 'none' : 'block';
       document.getElementById('bundle-controls').style.display = isBundle ? 'block' : 'none';
@@ -560,117 +615,106 @@
       if (isBundle) {
         renderBundleControlsFromSheet();
       } else {
-        const sizesArr = Array.isArray(activeItem.sizes) && activeItem.sizes.length > 0 ? activeItem.sizes : [37, 38, 39, 40, 41];
-        
-        let colorsArr = ['متوفرة'];
-        if (activeItem.colors) {
-          if (Array.isArray(activeItem.colors)) {
-            colorsArr = activeItem.colors;
-          } else {
-            colorsArr = String(activeItem.colors).split(/[,،]/).map(c => c.trim()).filter(Boolean);
-          }
-        }
-        if (colorsArr.length === 0) colorsArr = ['متوفرة'];
+        // قراءة المقاسات بدقة
+        let sizesArr = cleanAndSplitValues(activeItem.sizes);
+        if (sizesArr.length === 0) sizesArr = ['37', '38', '39', '40', '41'];
+
+        // قراءة الألوان سواء كانت في colors أو colorsRaw وفصلها كأزرار فردية
+        let colorsArr = cleanAndSplitValues(activeItem.colors || activeItem.colorsRaw);
+        if (colorsArr.length === 0) colorsArr = ['أساسي'];
 
         selectedSize = sizesArr[0];
         selectedColor = colorsArr[0];
 
-        document.getElementById('p-sizes').innerHTML = sizesArr.map((s, idx) => `
-          <div class="chip-btn ${idx === 0 ? 'selected' : ''}" onclick="selectSingleOption('p-sizes', this, '${s}', 'size')">${s}</div>
-        `).join('');
-
-        document.getElementById('p-colors').innerHTML = colorsArr.map((c, idx) => `
-          <div class="chip-btn ${idx === 0 ? 'selected' : ''}" onclick="selectSingleOption('p-colors', this, '${c}', 'color')">${c}</div>
-        `).join('');
+        renderChipList('p-sizes', sizesArr, selectedSize, val => selectedSize = val);
+        renderChipList('p-colors', colorsArr, selectedColor, val => selectedColor = val);
       }
 
       document.getElementById('product-drawer').classList.add('active');
     }
 
-    function selectSingleOption(containerId, elem, val, type) {
-      document.querySelectorAll(`#${containerId} .chip-btn`).forEach(el => el.classList.remove('selected'));
+    function renderChipList(containerId, list, defaultVal, onSelect) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = list.map(item => `
+        <div class="chip-btn ${item === defaultVal ? 'selected' : ''}" onclick="selectItemChip(this, '${containerId}', '${item}')">${item}</div>
+      `).join('');
+      container._onSelect = onSelect;
+    }
+
+    function selectItemChip(elem, containerId, val) {
+      const parent = document.getElementById(containerId);
+      parent.querySelectorAll('.chip-btn').forEach(c => c.classList.remove('selected'));
       elem.classList.add('selected');
-      if (type === 'size') selectedSize = val;
-      if (type === 'color') selectedColor = val;
+      if (parent._onSelect) parent._onSelect(val);
     }
 
     function renderBundleControlsFromSheet() {
-      const sizes = ['37', '38', '39', '40', '41'];
+      const defaultSizes = ['37', '38', '39', '40', '41'];
       let colors1 = ['اسود', 'بيج', 'هافان'];
       let colors2 = ['اسود', 'ابيض', 'بني', 'فضي', 'بيج'];
       let colors3 = ['اسود', 'بيج', 'هافان', 'كشمير'];
 
-      // دالة مساعدة لاستخراج الألوان بدقة من النصوص المقروءة من الشيت
-      const parseColorList = (text) => {
-        if (!text) return null;
-        let cleaned = String(text).replace(/[\[\]]/g, '');
-        let match = cleaned.match(/\((.*?)\)/);
-        if (match && match[1]) {
-          cleaned = match[1];
-        }
-        let list = cleaned.split(/[,،-]/).map(s => s.trim()).filter(Boolean);
-        return list.length > 0 ? list : null;
-      };
+      const raw = activeItem.colorsRaw || activeItem.colors;
 
-      if (activeItem && activeItem.colorsRaw) {
-        let raw = String(activeItem.colorsRaw);
-        // إذا كانت الألوان مقسّمة بشرطة "-" أو أقواس
-        if (raw.includes('-')) {
-          const parts = raw.split('-');
-          if (parts.length >= 3) {
-            colors1 = parseColorList(parts[0]) || colors1;
-            colors2 = parseColorList(parts[1]) || colors2;
-            colors3 = parseColorList(parts[2]) || colors3;
-          }
+      if (raw) {
+        let rawStr = String(raw);
+        // تقسيم البيانات لو كانت جاية لكل قطعة بفاصل رئيسي (+ أو / أو -)
+        let parts = [];
+        if (rawStr.includes('+')) {
+          parts = rawStr.split('+');
+        } else if (rawStr.includes('/')) {
+          parts = rawStr.split('/');
+        } else if (rawStr.includes('-') && (rawStr.match(/-/g) || []).length >= 2) {
+          parts = rawStr.split('-');
+        }
+
+        if (parts.length >= 3) {
+          const c1 = cleanAndSplitValues(parts[0]);
+          const c2 = cleanAndSplitValues(parts[1]);
+          const c3 = cleanAndSplitValues(parts[2]);
+          if (c1.length) colors1 = c1;
+          if (c2.length) colors2 = c2;
+          if (c3.length) colors3 = c3;
         } else {
-          let parsedAll = parseColorList(raw);
-          if (parsedAll && parsedAll.length >= 3) {
-            colors1 = [parsedAll[0]];
-            colors2 = [parsedAll[1]];
-            colors3 = parsedAll.slice(2);
+          const allColors = cleanAndSplitValues(rawStr);
+          if (allColors.length >= 3) {
+            colors1 = [allColors[0]];
+            colors2 = [allColors[1]];
+            colors3 = allColors.slice(2);
+          } else if (allColors.length > 0) {
+            colors1 = allColors;
+            colors2 = allColors;
+            colors3 = allColors;
           }
         }
       }
 
-      const isDeal420 = (activeItem.price == 420) || (activeItem.title && activeItem.title.includes('420')) || (activeItem.desc && activeItem.desc.includes('جذمة'));
+      const isDeal420 = (activeItem.price == 420) || 
+                        (activeItem.title && activeItem.title.includes('420')) || 
+                        (activeItem.desc && activeItem.desc.includes('جذمة'));
 
       if (isDeal420) {
         document.getElementById('b1-title').innerText = '1. سليبر فوم عالي منقرش';
         document.getElementById('b2-title').innerText = '2. جذمة كلاسيك طبية';
         document.getElementById('b3-title').innerText = '3. سليبر واطي تايجر';
       } else {
-        document.getElementById('b1-title').innerText = '1. القطعة الأولى (منقرش)';
-        document.getElementById('b2-title').innerText = '2. القطعة الثانية (تايجر)';
-        document.getElementById('b3-title').innerText = '3. القطعة الثالثة (شفاف)';
+        document.getElementById('b1-title').innerText = '1. القطعة الأولى';
+        document.getElementById('b2-title').innerText = '2. القطعة الثانية';
+        document.getElementById('b3-title').innerText = '3. القطعة الثالثة';
       }
 
-      b1 = { name: document.getElementById('b1-title').innerText, size: '37', color: colors1[0] };
-      b2 = { name: document.getElementById('b2-title').innerText, size: '37', color: colors2[0] };
-      b3 = { name: document.getElementById('b3-title').innerText, size: '37', color: colors3[0] };
+      b1 = { name: document.getElementById('b1-title').innerText, size: defaultSizes[0], color: colors1[0] };
+      b2 = { name: document.getElementById('b2-title').innerText, size: defaultSizes[0], color: colors2[0] };
+      b3 = { name: document.getElementById('b3-title').innerText, size: defaultSizes[0], color: colors3[0] };
 
-      renderChipGroup('b1-sizes', sizes, b1.size, val => b1.size = val);
-      renderChipGroup('b1-colors', colors1, b1.color, val => b1.color = val);
+      renderChipList('b1-sizes', defaultSizes, b1.size, val => b1.size = val);
+      renderChipList('b1-colors', colors1, b1.color, val => b1.color = val);
 
-      renderChipGroup('b2-sizes', sizes, b2.size, val => b2.size = val);
-      renderChipGroup('b2-colors', colors2, b2.color, val => b2.color = val);
+      renderChipList('b2-sizes', defaultSizes, b2.size, val => b2.size = val);
+      renderChipList('b2-colors', colors2, b2.color, val => b2.color = val);
 
-      renderChipGroup('b3-sizes', sizes, b3.size, val => b3.size = val);
-      renderChipGroup('b3-colors', colors3, b3.color, val => b3.color = val);
-    }
-
-    function renderChipGroup(containerId, list, defaultVal, onSelect) {
-      const container = document.getElementById(containerId);
-      container.innerHTML = list.map(item => `
-        <div class="chip-btn ${item === defaultVal ? 'selected' : ''}" onclick="updateChipGroup(this, '${containerId}', '${item}')">${item}</div>
-      `).join('');
-      container._onSelect = onSelect;
-    }
-
-    function updateChipGroup(elem, containerId, val) {
-      const parent = document.getElementById(containerId);
-      parent.querySelectorAll('.chip-btn').forEach(c => c.classList.remove('selected'));
-      elem.classList.add('selected');
-      if (parent._onSelect) parent._onSelect(val);
+      renderChipList('b3-sizes', defaultSizes, b3.size, val => b3.size = val);
+      renderChipList('b3-colors', colors3, b3.color, val => b3.color = val);
     }
 
     function openLightbox(src) {
@@ -683,7 +727,9 @@
     }
 
     function addToCartConfirm() {
-      const isBundle = String(activeItem.id).includes('09') || String(activeItem.id).includes('10') || (activeItem.title && activeItem.title.includes('عرض'));
+      const isBundle = String(activeItem.id).includes('09') || 
+                       String(activeItem.id).includes('10') || 
+                       (activeItem.title && activeItem.title.includes('عرض'));
 
       if (isBundle) {
         const specs = `[${b1.name}: مقاس ${b1.size} - لون ${b1.color}] + [${b2.name}: مقاس ${b2.size} - لون ${b2.color}] + [${b3.name}: مقاس ${b3.size} - لون ${b3.color}]`;
@@ -692,8 +738,8 @@
           key: itemKey,
           id: activeItem.id,
           title: activeItem.title,
-          price: activeItem.price,
-          size: '3 قطع',
+          price: Number(activeItem.price),
+          size: 'عرض 3 قطع',
           color: specs,
           qty: 1
         });
@@ -707,7 +753,7 @@
             key: itemKey,
             id: activeItem.id,
             title: activeItem.title,
-            price: activeItem.price,
+            price: Number(activeItem.price),
             size: selectedSize,
             color: selectedColor,
             qty: 1
@@ -733,7 +779,7 @@
 
       const listContainer = document.getElementById('cart-list');
       if (cart.length === 0) {
-        listContainer.innerHTML = '<p style="text-align:center; color: var(--text-muted); padding:20px;">السلة فارغة</p>';
+        listContainer.innerHTML = '<p style="text-align:center; color: var(--text-muted); padding:30px 0;">السلة فارغة حالياً</p>';
         document.getElementById('cart-total-val').innerText = '0 ج.م';
         return;
       }
@@ -745,10 +791,10 @@
           <div class="cart-line">
             <div style="max-width: 85%;">
               <div style="font-weight:700; font-size:0.9rem;">${item.title}</div>
-              <div style="font-size:0.75rem; color:var(--text-muted); line-height: 1.4; margin-top:2px;">${item.color}</div>
-              <div style="font-size:0.85rem; font-weight:700; margin-top: 3px;">${item.price} ج.م × ${item.qty}</div>
+              <div style="font-size:0.75rem; color:var(--text-muted); line-height: 1.4; margin-top:3px;">${item.color}</div>
+              <div style="font-size:0.85rem; font-weight:700; color:var(--gold-dark); margin-top: 4px;">${item.price} ج.م × ${item.qty}</div>
             </div>
-            <button onclick="deleteItem(${index})" style="background:none; border:none; color:#c0392b; font-size:1.1rem; cursor:pointer;">✕</button>
+            <button onclick="deleteItem(${index})" style="background:none; border:none; color:var(--danger); font-size:1.2rem; cursor:pointer; padding: 4px;">✕</button>
           </div>
         `;
       }).join('');
@@ -780,7 +826,7 @@
       const total = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
 
       const submitBtn = document.getElementById('submit-btn');
-      submitBtn.innerText = 'جاري تسجيل طلبك...';
+      submitBtn.innerText = 'جاري تسجيل الطلب...';
       submitBtn.disabled = true;
 
       const itemsSummary = cart.map(i => `${i.title} (${i.qty})`).join('، ');
@@ -801,14 +847,14 @@
           })
         });
       } catch (err) {
-        console.log("خطأ تسجيل الطلب:", err);
+        console.error("خطأ تسجيل الطلب بالشيت:", err);
       }
 
-      let msg = `طلب جديد من متجر RAHA:\nالاسم: ${name}\nالهاتف: ${phone}\nالعنوان: ${address}\n\nتفاصيل المنتجات:\n`;
+      let msg = `طلب جديد من متجر RAHA:\nالاسم: ${name}\nالهاتف: ${phone}\nالعنوان: ${address}\n\nتفاصيل الطلب:\n`;
       cart.forEach(i => {
         msg += `- ${i.title} × ${i.qty}\n  ${i.color}\n`;
       });
-      msg += `\nالإجمالي: ${total} ج.م (شامل مصاريف الشحن)`;
+      msg += `\nالإجمالي: ${total} ج.م (شامل التوصيل)`;
 
       const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
       window.open(waUrl, '_blank');
