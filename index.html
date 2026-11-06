@@ -436,7 +436,6 @@
         <span id="p-price" style="font-size: 1.3rem; font-weight: 800; color: var(--gold-dark);"></span>
       </div>
 
-      <!-- عناصر اختيار المنتج الفردي -->
       <div id="single-controls">
         <div class="options-title">المقاس:</div>
         <div class="options-row" id="p-sizes"></div>
@@ -444,10 +443,9 @@
         <div class="options-row" id="p-colors"></div>
       </div>
 
-      <!-- عناصر اختيار العروض -->
       <div id="bundle-controls" style="display: none;">
         <div class="bundle-box">
-          <div class="bundle-box-title" id="b1-title">القطعة الأولى</div>
+          <div class="bundle-box-title" id="b1-title">1. سليبر فوم عالي منقرش</div>
           <div class="options-title">المقاس:</div>
           <div class="options-row" id="b1-sizes"></div>
           <div class="options-title">اللون:</div>
@@ -455,7 +453,7 @@
         </div>
 
         <div class="bundle-box">
-          <div class="bundle-box-title" id="b2-title">القطعة الثانية</div>
+          <div class="bundle-box-title" id="b2-title">2. جذمة كلاسيك طبية</div>
           <div class="options-title">المقاس:</div>
           <div class="options-row" id="b2-sizes"></div>
           <div class="options-title">اللون:</div>
@@ -463,7 +461,7 @@
         </div>
 
         <div class="bundle-box">
-          <div class="bundle-box-title" id="b3-title">القطعة الثالثة</div>
+          <div class="bundle-box-title" id="b3-title">3. سليبر واطي تايجر</div>
           <div class="options-title">المقاس:</div>
           <div class="options-row" id="b3-sizes"></div>
           <div class="options-title">اللون:</div>
@@ -531,7 +529,7 @@
           renderCatalog();
         }
       } catch (err) {
-        console.error("خطأ في جلب بيانات الشيت:", err);
+        console.error("خطأ جلب البيانات:", err);
       } finally {
         const splash = document.getElementById('splash');
         if (splash) {
@@ -601,9 +599,16 @@
       document.getElementById('p-desc').innerText = activeItem.desc || '';
       document.getElementById('p-price').innerText = `${activeItem.price} ج.م`;
 
-      const isBundle = String(activeItem.id).includes('09') || 
-                       String(activeItem.id).includes('10') || 
-                       (activeItem.title && activeItem.title.includes('عرض'));
+      const titleText = String(activeItem.title || '');
+      const descText = String(activeItem.desc || '');
+      const priceText = String(activeItem.price || '');
+      const idText = String(activeItem.id || '');
+
+      const isBundle = idText.includes('09') || 
+                       idText.includes('10') || 
+                       titleText.includes('عرض') || 
+                       titleText.includes('420') ||
+                       priceText.includes('420');
 
       document.getElementById('single-controls').style.display = isBundle ? 'none' : 'block';
       document.getElementById('bundle-controls').style.display = isBundle ? 'block' : 'none';
@@ -645,9 +650,16 @@
     function renderBundleControlsFromSheet() {
       const defaultSizes = ['37', '38', '39', '40', '41'];
       
-      const isDeal420 = (activeItem.price == 420) || 
-                        (activeItem.title && activeItem.title.includes('420')) || 
-                        (activeItem.desc && activeItem.desc.includes('جذمة'));
+      const titleStr = String(activeItem.title || '');
+      const descStr = String(activeItem.desc || '');
+      const priceStr = String(activeItem.price || '');
+
+      // كشف عرض الـ 420 بشكل حاسم ومباشر
+      const isDeal420 = priceStr.includes('420') || 
+                        titleStr.includes('420') || 
+                        titleStr.includes('جذمة') || 
+                        descStr.includes('جذمة') ||
+                        descStr.includes('420');
 
       let colors1 = [];
       let colors2 = [];
@@ -658,11 +670,11 @@
         document.getElementById('b2-title').innerText = '2. جذمة كلاسيك طبية';
         document.getElementById('b3-title').innerText = '3. سليبر واطي تايجر';
 
-        // 1. العالي: 3 ألوان (بدون بني)
+        // 1. العالي: 3 ألوان محددة بدون بني
         colors1 = ['هافان', 'بيج', 'اسود'];
-        // 2. الجذمة: 3 ألوان (بدون كحلي وبدون بني + هافان)
+        // 2. الجذمة: 3 ألوان محددة بدون كحلي وبدون بني
         colors2 = ['اسود', 'هافان', 'بيج'];
-        // 3. التايجر: البني فيه مع الألوان المطلوبة كلها
+        // 3. التايجر: البني وباقي الألوان كأزرار منفصلة تماماً
         colors3 = ['بني', 'دهبي', 'فضي', 'هافان', 'اسود', 'ابيض', 'بيج'];
       } else {
         document.getElementById('b1-title').innerText = '1. سليبر منقرش';
@@ -698,9 +710,15 @@
     }
 
     function addToCartConfirm() {
-      const isBundle = String(activeItem.id).includes('09') || 
-                       String(activeItem.id).includes('10') || 
-                       (activeItem.title && activeItem.title.includes('عرض'));
+      const titleText = String(activeItem.title || '');
+      const priceText = String(activeItem.price || '');
+      const idText = String(activeItem.id || '');
+
+      const isBundle = idText.includes('09') || 
+                       idText.includes('10') || 
+                       titleText.includes('عرض') || 
+                       titleText.includes('420') ||
+                       priceText.includes('420');
 
       if (isBundle) {
         const specs = `[${b1.name}: مقاس ${b1.size} - لون ${b1.color}] + [${b2.name}: مقاس ${b2.size} - لون ${b2.color}] + [${b3.name}: مقاس ${b3.size} - لون ${b3.color}]`;
@@ -709,7 +727,7 @@
           key: itemKey,
           id: activeItem.id,
           title: activeItem.title,
-          price: Number(activeItem.price),
+          price: Number(String(activeItem.price).replace(/[^0-9]/g, '')) || 420,
           size: 'عرض 3 قطع',
           color: specs,
           qty: 1
@@ -724,7 +742,7 @@
             key: itemKey,
             id: activeItem.id,
             title: activeItem.title,
-            price: Number(activeItem.price),
+            price: Number(String(activeItem.price).replace(/[^0-9]/g, '')) || 0,
             size: selectedSize,
             color: selectedColor,
             qty: 1
@@ -818,7 +836,7 @@
           })
         });
       } catch (err) {
-        console.error("خطأ تسجيل الطلب بالشيت:", err);
+        console.error("خطأ تسجيل الطلب:", err);
       }
 
       let msg = `طلب جديد من متجر RAHA:\nالاسم: ${name}\nالهاتف: ${phone}\nالعنوان: ${address}\n\nتفاصيل الطلب:\n`;
