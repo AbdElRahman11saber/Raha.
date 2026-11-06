@@ -562,7 +562,7 @@
       } else {
         const sizesArr = Array.isArray(activeItem.sizes) && activeItem.sizes.length > 0 ? activeItem.sizes : [37, 38, 39, 40, 41];
         
-        let colorsArr = ['متوفر'];
+        let colorsArr = ['متوفرة'];
         if (activeItem.colors) {
           if (Array.isArray(activeItem.colors)) {
             colorsArr = activeItem.colors;
@@ -570,7 +570,7 @@
             colorsArr = String(activeItem.colors).split(/[,،]/).map(c => c.trim()).filter(Boolean);
           }
         }
-        if (colorsArr.length === 0) colorsArr = ['متوفر'];
+        if (colorsArr.length === 0) colorsArr = ['متوفرة'];
 
         selectedSize = sizesArr[0];
         selectedColor = colorsArr[0];
@@ -600,19 +600,35 @@
       let colors2 = ['اسود', 'ابيض', 'بني', 'فضي', 'بيج'];
       let colors3 = ['اسود', 'بيج', 'هافان', 'كشمير'];
 
+      // دالة مساعدة لاستخراج الألوان بدقة من النصوص المقروءة من الشيت
+      const parseColorList = (text) => {
+        if (!text) return null;
+        let cleaned = String(text).replace(/[\[\]]/g, '');
+        let match = cleaned.match(/\((.*?)\)/);
+        if (match && match[1]) {
+          cleaned = match[1];
+        }
+        let list = cleaned.split(/[,،-]/).map(s => s.trim()).filter(Boolean);
+        return list.length > 0 ? list : null;
+      };
+
       if (activeItem && activeItem.colorsRaw) {
-        const parts = activeItem.colorsRaw.split('-');
-        if (parts.length >= 3) {
-          const parseColors = (str) => {
-            const match = str.match(/\((.*?)\)/);
-            if (match && match[1]) {
-              return match[1].split(/[,،]/).map(s => s.trim()).filter(Boolean);
-            }
-            return str.split(/[,،]/).map(s => s.trim()).filter(Boolean);
-          };
-          colors1 = parseColors(parts[0]) || colors1;
-          colors2 = parseColors(parts[1]) || colors2;
-          colors3 = parseColors(parts[2]) || colors3;
+        let raw = String(activeItem.colorsRaw);
+        // إذا كانت الألوان مقسّمة بشرطة "-" أو أقواس
+        if (raw.includes('-')) {
+          const parts = raw.split('-');
+          if (parts.length >= 3) {
+            colors1 = parseColorList(parts[0]) || colors1;
+            colors2 = parseColorList(parts[1]) || colors2;
+            colors3 = parseColorList(parts[2]) || colors3;
+          }
+        } else {
+          let parsedAll = parseColorList(raw);
+          if (parsedAll && parsedAll.length >= 3) {
+            colors1 = [parsedAll[0]];
+            colors2 = [parsedAll[1]];
+            colors3 = parsedAll.slice(2);
+          }
         }
       }
 
@@ -622,23 +638,15 @@
         document.getElementById('b1-title').innerText = '1. سليبر فوم عالي منقرش';
         document.getElementById('b2-title').innerText = '2. جذمة كلاسيك طبية';
         document.getElementById('b3-title').innerText = '3. سليبر واطي تايجر';
-        
-        colors1 = ['بني هافان'];
-        colors2 = ['أسود'];
-        colors3 = ['اسود', 'ابيض', 'بني', 'فضي', 'بيج'];
-
-        b1 = { name: 'فوم عالي منقرش', size: '37', color: colors1[0] };
-        b2 = { name: 'جذمة كلاسيك طبية', size: '37', color: colors2[0] };
-        b3 = { name: 'سليبر واطي تايجر', size: '37', color: colors3[0] };
       } else {
-        document.getElementById('b1-title').innerText = '1. السليبر المنقرش';
-        document.getElementById('b2-title').innerText = '2. السليبر التايجر';
-        document.getElementById('b3-title').innerText = '3. السليبر الشفاف';
-
-        b1 = { name: 'منقرش', size: '37', color: colors1[0] };
-        b2 = { name: 'تايجر', size: '37', color: colors2[0] };
-        b3 = { name: 'شفاف', size: '37', color: colors3[0] };
+        document.getElementById('b1-title').innerText = '1. القطعة الأولى (منقرش)';
+        document.getElementById('b2-title').innerText = '2. القطعة الثانية (تايجر)';
+        document.getElementById('b3-title').innerText = '3. القطعة الثالثة (شفاف)';
       }
+
+      b1 = { name: document.getElementById('b1-title').innerText, size: '37', color: colors1[0] };
+      b2 = { name: document.getElementById('b2-title').innerText, size: '37', color: colors2[0] };
+      b3 = { name: document.getElementById('b3-title').innerText, size: '37', color: colors3[0] };
 
       renderChipGroup('b1-sizes', sizes, b1.size, val => b1.size = val);
       renderChipGroup('b1-colors', colors1, b1.color, val => b1.color = val);
