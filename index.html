@@ -331,9 +331,7 @@
       padding: 16px;
     }
 
-    #image-lightbox.active {
-      display: flex;
-    }
+    #image-lightbox.active { display: flex; }
 
     #image-lightbox img {
       max-width: 95%;
@@ -465,18 +463,7 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxDIc69z2S_KD2C2N_ZQGMfzPokdTGChvABDI7ymkQPo3zGJT5k1HICGflMy_vmWeJF9g/exec";
     const waNumber = "201203541255";
 
-    const baseProducts = [
-      { id: "RAHA-02", title: "سليبر واطي منقرش", category: "أحذية وسليبرات", price: 145, onSale: false, desc: "خامة قماشية بنقوش هندسية", img: "https://lh3.googleusercontent.com/d/1_ZrlwKsSg-PCKNuCqMA_dtQsKL9ATxhv", sizes: [37, 38, 39, 40, 41], colors: ["اسود", "بيج", "هافان"] },
-      { id: "RAHA-03", title: "الماظ", category: "أحذية وسليبرات", price: 175, onSale: false, desc: "جلد مريح مع شريط ستراس", img: "https://lh3.googleusercontent.com/d/165h60hm2a5qDN2yFbSAIiU3WoKv5E6nJ", sizes: [37, 38, 39, 40, 41], colors: ["هافان"] },
-      { id: "RAHA-04", title: "جذمة", category: "أحذية وسليبرات", price: 185, onSale: false, desc: "حذاء فلات طبي مريح", img: "https://lh3.googleusercontent.com/d/1GyOqvo4mPVna7IaGY1Heaz1GLLQUYEGG", sizes: [37, 38, 39, 40, 41], colors: ["أسود"] },
-      { id: "RAHA-05", title: "سليبر عالي منقرش", category: "أحذية وسليبرات", price: 165, onSale: false, desc: "شريط تريكو ونعل خفيف", img: "https://lh3.googleusercontent.com/d/1PRWzi8AYWz3RzbLLDNypkP7b2LRQ_awY", sizes: [37, 38, 39, 40, 41], colors: ["بني هافان"] },
-      { id: "RAHA-06", title: "سليبر عالي نصين", category: "أحذية وسليبرات", price: 165, onSale: false, desc: "شريط ملون ناعم", img: "https://lh3.googleusercontent.com/d/1eKCfyUUXSz_k6seF3owWsmOX_YBpfwLW", sizes: [37, 38, 39, 40, 41], colors: ["متعدد"] },
-      { id: "RAHA-07", title: "سليبر واطي شفاف", category: "أحذية وسليبرات", price: 145, onSale: false, desc: "دانتيل روز مفرغ راقي", img: "https://lh3.googleusercontent.com/d/1xX7rNoc3LL5u28zX63cyOq_ZERDdAwml", sizes: [37, 38, 39, 40, 41], colors: ["اسود", "بيج", "هافان", "كشمير"] },
-      { id: "RAHA-08", title: "سليبر واطي تايجر", category: "أحذية وسليبرات", price: 145, onSale: false, desc: "نقشة زيبرا عصرية", img: "https://lh3.googleusercontent.com/d/1THl7Uyou0BmM8eiK9ef0513TYmeLOwfz", sizes: [37, 38, 39, 40, 41], colors: ["اسود", "ابيض", "بني", "فضي", "بيج"] },
-      { id: "RAHA-09", title: "عرض الـ 3 (بـ 420 ج)", category: "العروض", price: 420, onSale: true, desc: "عرض خاص: سليبر فوم عالي منقرش + جذمة كلاسيك طبية + سليبر واطي تايجر والشحن مجاناً!", img: "https://lh3.googleusercontent.com/d/102L8qaxd885tI6BbUxy_i6LxaWXcggEZ", sizes: [37, 38, 39, 40, 41], colors: [] }
-    ];
-
-    let productsData = [...baseProducts];
+    let productsData = [];
     let currentFilter = 'all';
     let activeItem = null;
     let selectedSize = null;
@@ -494,17 +481,7 @@
     }
 
     window.addEventListener('load', () => {
-      renderCatalog();
       syncCartUI();
-
-      setTimeout(() => {
-        const splash = document.getElementById('splash');
-        if (splash) {
-          splash.style.opacity = '0';
-          setTimeout(() => splash.style.visibility = 'hidden', 800);
-        }
-      }, 700);
-
       fetchProductsFromSheet();
     });
 
@@ -512,12 +489,18 @@
       try {
         const res = await fetch(SCRIPT_URL);
         const data = await res.json();
-        if (Array.isArray(data) && data.length > 0 && data[0].title && data[0].title !== 'موديل RAHA') {
+        if (Array.isArray(data) && data.length > 0) {
           productsData = data;
           renderCatalog();
         }
       } catch (err) {
-        console.log("استمرار العمل بالبيانات المحلية:", err);
+        console.log("خطأ في جلب بيانات الشيت:", err);
+      } finally {
+        const splash = document.getElementById('splash');
+        if (splash) {
+          splash.style.opacity = '0';
+          setTimeout(() => splash.style.visibility = 'hidden', 800);
+        }
       }
     }
 
@@ -575,16 +558,19 @@
       document.getElementById('bundle-controls').style.display = isBundle ? 'block' : 'none';
 
       if (isBundle) {
-        renderBundleControls();
+        renderBundleControlsFromSheet();
       } else {
-        selectedSize = (activeItem.sizes && activeItem.sizes.length) ? activeItem.sizes[0] : '37';
-        selectedColor = (activeItem.colors && activeItem.colors.length) ? activeItem.colors[0] : 'اللون المعروض';
+        const sizesArr = Array.isArray(activeItem.sizes) ? activeItem.sizes : [37, 38, 39, 40, 41];
+        const colorsArr = Array.isArray(activeItem.colors) ? activeItem.colors : [activeItem.colors || 'متوفر'];
 
-        document.getElementById('p-sizes').innerHTML = (activeItem.sizes || []).map((s, idx) => `
+        selectedSize = sizesArr[0];
+        selectedColor = colorsArr[0];
+
+        document.getElementById('p-sizes').innerHTML = sizesArr.map((s, idx) => `
           <div class="chip-btn ${idx === 0 ? 'selected' : ''}" onclick="selectSingleOption('p-sizes', this, '${s}', 'size')">${s}</div>
         `).join('');
 
-        document.getElementById('p-colors').innerHTML = (activeItem.colors || []).map((c, idx) => `
+        document.getElementById('p-colors').innerHTML = colorsArr.map((c, idx) => `
           <div class="chip-btn ${idx === 0 ? 'selected' : ''}" onclick="selectSingleOption('p-colors', this, '${c}', 'color')">${c}</div>
         `).join('');
       }
@@ -599,53 +585,61 @@
       if (type === 'color') selectedColor = val;
     }
 
-    function renderBundleControls() {
-      const isDeal420 = (activeItem.price == 420) || (activeItem.title && activeItem.title.includes('420')) || (activeItem.desc && activeItem.desc.includes('420')) || (activeItem.desc && activeItem.desc.includes('جذمة'));
+    function renderBundleControlsFromSheet() {
       const sizes = ['37', '38', '39', '40', '41'];
+      let colors1 = ['اسود', 'بيج', 'هافان'];
+      let colors2 = ['اسود', 'ابيض', 'بني', 'فضي', 'بيج'];
+      let colors3 = ['اسود', 'بيج', 'هافان', 'كشمير'];
+
+      // تحليل ألوان العرض دايركت من نص عمود الألوان في الشيت لو موجود
+      if (activeItem && activeItem.colorsRaw) {
+        const parts = activeItem.colorsRaw.split('-');
+        if (parts.length >= 3) {
+          const parseColors = (str) => {
+            const match = str.match(/\((.*?)\)/);
+            if (match && match[1]) {
+              return match[1].split(',').map(s => s.trim());
+            }
+            return str.split(',').map(s => s.trim());
+          };
+          colors1 = parseColors(parts[0]) || colors1;
+          colors2 = parseColors(parts[1]) || colors2;
+          colors3 = parseColors(parts[2]) || colors3;
+        }
+      }
+
+      const isDeal420 = (activeItem.price == 420) || (activeItem.title && activeItem.title.includes('420')) || (activeItem.desc && activeItem.desc.includes('جذمة'));
 
       if (isDeal420) {
         document.getElementById('b1-title').innerText = '1. سليبر فوم عالي منقرش';
         document.getElementById('b2-title').innerText = '2. جذمة كلاسيك طبية';
         document.getElementById('b3-title').innerText = '3. سليبر واطي تايجر';
+        
+        colors1 = ['بني هافان'];
+        colors2 = ['أسود'];
+        colors3 = ['اسود', 'ابيض', 'بني', 'فضي', 'بيج'];
 
-        const c1 = ['بني هافان'];
-        const c2 = ['أسود'];
-        const c3 = ['اسود', 'ابيض', 'بني', 'فضي', 'بيج'];
-
-        b1 = { name: 'فوم عالي منقرش', size: '37', color: c1[0] };
-        b2 = { name: 'جذمة كلاسيك طبية', size: '37', color: c2[0] };
-        b3 = { name: 'سليبر واطي تايجر', size: '37', color: c3[0] };
-
-        renderChipGroup('b1-sizes', sizes, b1.size, val => b1.size = val);
-        renderChipGroup('b1-colors', c1, b1.color, val => b1.color = val);
-
-        renderChipGroup('b2-sizes', sizes, b2.size, val => b2.size = val);
-        renderChipGroup('b2-colors', c2, b2.color, val => b2.color = val);
-
-        renderChipGroup('b3-sizes', sizes, b3.size, val => b3.size = val);
-        renderChipGroup('b3-colors', c3, b3.color, val => b3.color = val);
+        b1 = { name: 'فوم عالي منقرش', size: '37', color: colors1[0] };
+        b2 = { name: 'جذمة كلاسيك طبية', size: '37', color: colors2[0] };
+        b3 = { name: 'سليبر واطي تايجر', size: '37', color: colors3[0] };
       } else {
         document.getElementById('b1-title').innerText = '1. السليبر المنقرش';
         document.getElementById('b2-title').innerText = '2. السليبر التايجر';
         document.getElementById('b3-title').innerText = '3. السليبر الشفاف';
 
-        const c1 = ['اسود', 'بيج', 'هافان'];
-        const c2 = ['اسود', 'ابيض', 'بني', 'فضي', 'بيج'];
-        const c3 = ['اسود', 'بيج', 'هافان', 'كشمير'];
-
-        b1 = { name: 'منقرش', size: '37', color: c1[0] };
-        b2 = { name: 'تايجر', size: '37', color: c2[0] };
-        b3 = { name: 'شفاف', size: '37', color: c3[0] };
-
-        renderChipGroup('b1-sizes', sizes, b1.size, val => b1.size = val);
-        renderChipGroup('b1-colors', c1, b1.color, val => b1.color = val);
-
-        renderChipGroup('b2-sizes', sizes, b2.size, val => b2.size = val);
-        renderChipGroup('b2-colors', c2, b2.color, val => b2.color = val);
-
-        renderChipGroup('b3-sizes', sizes, b3.size, val => b3.size = val);
-        renderChipGroup('b3-colors', c3, b3.color, val => b3.color = val);
+        b1 = { name: 'منقرش', size: '37', color: colors1[0] };
+        b2 = { name: 'تايجر', size: '37', color: colors2[0] };
+        b3 = { name: 'شفاف', size: '37', color: colors3[0] };
       }
+
+      renderChipGroup('b1-sizes', sizes, b1.size, val => b1.size = val);
+      renderChipGroup('b1-colors', colors1, b1.color, val => b1.color = val);
+
+      renderChipGroup('b2-sizes', sizes, b2.size, val => b2.size = val);
+      renderChipGroup('b2-colors', colors2, b2.color, val => b2.color = val);
+
+      renderChipGroup('b3-sizes', sizes, b3.size, val => b3.size = val);
+      renderChipGroup('b3-colors', colors3, b3.color, val => b3.color = val);
     }
 
     function renderChipGroup(containerId, list, defaultVal, onSelect) {
