@@ -415,13 +415,11 @@
     <div class="catalog-grid" id="catalog-container"></div>
   </main>
 
-  <!-- Lightbox -->
   <div id="image-lightbox" onclick="closeLightbox()">
     <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
     <img id="lightbox-img" src="" alt="تكبير الصورة">
   </div>
 
-  <!-- Product Modal Drawer -->
   <div class="drawer-overlay" id="product-drawer">
     <div class="drawer-sheet">
       <div class="sheet-header">
@@ -440,9 +438,9 @@
 
       <!-- عناصر اختيار المنتج الفردي -->
       <div id="single-controls">
-        <div class="options-title">المقاس المتاح:</div>
+        <div class="options-title">المقاس:</div>
         <div class="options-row" id="p-sizes"></div>
-        <div class="options-title">اللون المتاح:</div>
+        <div class="options-title">اللون:</div>
         <div class="options-row" id="p-colors"></div>
       </div>
 
@@ -477,7 +475,6 @@
     </div>
   </div>
 
-  <!-- Cart Drawer -->
   <div class="drawer-overlay" id="cart-drawer">
     <div class="drawer-sheet">
       <div class="sheet-header">
@@ -486,7 +483,7 @@
       </div>
       <div id="cart-list"></div>
       <div style="display:flex; justify-content:space-between; margin-top:16px; padding-top: 10px; border-top: 1px dashed var(--border); font-weight:700;">
-        <span>الإجمالي النهائي:</span>
+        <span>الإجمالي:</span>
         <span id="cart-total-val" style="color: var(--gold-dark); font-size: 1.15rem;">0 ج.م</span>
       </div>
 
@@ -583,7 +580,6 @@
       renderCatalog();
     }
 
-    // تفكيك ألوان الشيت بدون كتل مدمجة
     function cleanAndSplitValues(val) {
       if (!val) return [];
       if (Array.isArray(val)) {
@@ -649,14 +645,13 @@
     function renderBundleControlsFromSheet() {
       const defaultSizes = ['37', '38', '39', '40', '41'];
       
-      // التوزيع المضبوط والدقيق للألوان حسب طلبك
-      let colors1 = ['هافان', 'بيج', 'اسود'];
-      let colors2 = ['اسود', 'هافان', 'بيج'];
-      let colors3 = ['بني', 'دهبي', 'فضي', 'هافان', 'اسود', 'ابيض', 'بيج'];
-
       const isDeal420 = (activeItem.price == 420) || 
                         (activeItem.title && activeItem.title.includes('420')) || 
                         (activeItem.desc && activeItem.desc.includes('جذمة'));
+
+      let colors1 = [];
+      let colors2 = [];
+      let colors3 = [];
 
       if (isDeal420) {
         document.getElementById('b1-title').innerText = '1. سليبر فوم عالي منقرش';
@@ -665,14 +660,18 @@
 
         // 1. العالي: 3 ألوان (بدون بني)
         colors1 = ['هافان', 'بيج', 'اسود'];
-        // 2. الجذمة: 3 ألوان (بدون بني وبدون كحلي + هافان)
+        // 2. الجذمة: 3 ألوان (بدون كحلي وبدون بني + هافان)
         colors2 = ['اسود', 'هافان', 'بيج'];
-        // 3. التايجر: البني يفضل فيه + الألوان الإضافية المطلوبة
+        // 3. التايجر: البني فيه مع الألوان المطلوبة كلها
         colors3 = ['بني', 'دهبي', 'فضي', 'هافان', 'اسود', 'ابيض', 'بيج'];
       } else {
         document.getElementById('b1-title').innerText = '1. سليبر منقرش';
         document.getElementById('b2-title').innerText = '2. سليبر تايجر';
         document.getElementById('b3-title').innerText = '3. سليبر شفاف';
+
+        colors1 = ['اسود', 'بيج', 'هافان'];
+        colors2 = ['اسود', 'ابيض', 'بني', 'فضي', 'بيج'];
+        colors3 = ['اسود', 'بيج', 'هافان', 'كشمير'];
       }
 
       b1 = { name: document.getElementById('b1-title').innerText, size: defaultSizes[0], color: colors1[0] };
