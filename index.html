@@ -114,10 +114,6 @@
       gap: 6px;
     }
 
-    .cart-btn:active {
-      transform: scale(0.96);
-    }
-
     .filters-wrapper {
       padding: 14px 16px 8px;
       display: flex;
@@ -167,10 +163,6 @@
       display: flex;
       flex-direction: column;
       position: relative;
-    }
-
-    .item-card:active {
-      transform: scale(0.98);
     }
 
     .card-thumb {
@@ -432,7 +424,7 @@
         <span id="p-price" style="font-size: 1.3rem; font-weight: 800; color: var(--gold-dark);"></span>
       </div>
 
-      <!-- Single Product Options -->
+      <!-- Single Options -->
       <div id="single-controls">
         <div class="options-title">المقاس:</div>
         <div class="options-row" id="p-sizes"></div>
@@ -520,7 +512,7 @@
 
     async function fetchProductsFromSheet() {
       try {
-        const res = await fetch(`${SCRIPT_URL}?t=${Date.now()}`);
+        const res = await fetch(`${SCRIPT_URL}?v=${Date.now()}`);
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
           productsData = data;
@@ -597,17 +589,16 @@
       document.getElementById('p-desc').innerText = activeItem.desc || '';
       document.getElementById('p-price').innerText = `${activeItem.price} ج.م`;
 
-      const title = String(activeItem.title || '');
-      const desc = String(activeItem.desc || '');
-      const price = String(activeItem.price || '');
-      const pId = String(activeItem.id || '');
+      const idStr = String(activeItem.id || '');
+      const titleStr = String(activeItem.title || '');
+      const priceStr = String(activeItem.price || '');
 
-      const isBundle = pId.includes('09') || 
-                       pId.includes('10') || 
-                       title.includes('عرض') || 
-                       title.includes('420') ||
-                       price.includes('420') ||
-                       desc.includes('عرض');
+      // الكشف الدقيق عن العروض
+      const isBundle = idStr.includes('09') || 
+                       idStr.includes('10') || 
+                       titleStr.includes('عرض') || 
+                       priceStr.includes('420') || 
+                       priceStr.includes('360');
 
       document.getElementById('single-controls').style.display = isBundle ? 'none' : 'block';
       document.getElementById('bundle-controls').style.display = isBundle ? 'block' : 'none';
@@ -648,19 +639,40 @@
 
     function setupBundleItems() {
       const defaultSizes = ['37', '38', '39', '40', '41'];
+      const idStr = String(activeItem.id || '');
+      const titleStr = String(activeItem.title || '');
+      const priceStr = String(activeItem.price || '');
 
-      // فرض الألوان والمسميات بدقة تامة دون قراءة العبارات المدمجة من الشيت
-      document.getElementById('b1-title').innerText = '1. سليبر فوم عالي منقرش';
-      document.getElementById('b2-title').innerText = '2. جذمة كلاسيك طبية';
-      document.getElementById('b3-title').innerText = '3. سليبر واطي تايجر';
+      // إذا كان المنتج هو عرض 420 (RAHA-10)
+      const isDeal420 = idStr.includes('10') || priceStr.includes('420') || titleStr.includes('420');
 
-      const colors1 = ['هافان', 'بيج', 'اسود'];
-      const colors2 = ['اسود', 'هافان', 'بيج'];
-      const colors3 = ['بني', 'دهبي', 'فضي', 'هافان', 'اسود', 'ابيض', 'بيج'];
+      let colors1 = [];
+      let colors2 = [];
+      let colors3 = [];
 
-      b1 = { name: 'سليبر فوم عالي منقرش', size: defaultSizes[0], color: colors1[0] };
-      b2 = { name: 'جذمة كلاسيك طبية', size: defaultSizes[0], color: colors2[0] };
-      b3 = { name: 'سليبر واطي تايجر', size: defaultSizes[0], color: colors3[0] };
+      if (isDeal420) {
+        document.getElementById('b1-title').innerText = '1. سليبر فوم عالي منقرش';
+        document.getElementById('b2-title').innerText = '2. جذمة كلاسيك طبية';
+        document.getElementById('b3-title').innerText = '3. سليبر واطي تايجر';
+
+        // الألوان المحددة تماماً بدون الاعتماد على نصوص الشيت
+        colors1 = ['هافان', 'بيج', 'اسود'];
+        colors2 = ['اسود', 'هافان', 'بيج'];
+        colors3 = ['بني', 'دهبي', 'فضي', 'هافان', 'اسود', 'ابيض', 'بيج'];
+      } else {
+        // عرض الـ 360 (RAHA-09)
+        document.getElementById('b1-title').innerText = '1. سليبر منقرش';
+        document.getElementById('b2-title').innerText = '2. سليبر تايجر';
+        document.getElementById('b3-title').innerText = '3. سليبر شفاف';
+
+        colors1 = ['اسود', 'بيج', 'هافان'];
+        colors2 = ['اسود', 'ابيض', 'بني', 'فضي', 'بيج'];
+        colors3 = ['اسود', 'بيج', 'هافان', 'كشمير'];
+      }
+
+      b1 = { name: document.getElementById('b1-title').innerText, size: defaultSizes[0], color: colors1[0] };
+      b2 = { name: document.getElementById('b2-title').innerText, size: defaultSizes[0], color: colors2[0] };
+      b3 = { name: document.getElementById('b3-title').innerText, size: defaultSizes[0], color: colors3[0] };
 
       renderChipList('b1-sizes', defaultSizes, b1.size, val => b1.size = val);
       renderChipList('b1-colors', colors1, b1.color, val => b1.color = val);
@@ -682,15 +694,15 @@
     }
 
     function addToCartConfirm() {
-      const title = String(activeItem.title || '');
-      const price = String(activeItem.price || '');
-      const pId = String(activeItem.id || '');
+      const idStr = String(activeItem.id || '');
+      const titleStr = String(activeItem.title || '');
+      const priceStr = String(activeItem.price || '');
 
-      const isBundle = pId.includes('09') || 
-                       pId.includes('10') || 
-                       title.includes('عرض') || 
-                       title.includes('420') ||
-                       price.includes('420');
+      const isBundle = idStr.includes('09') || 
+                       idStr.includes('10') || 
+                       titleStr.includes('عرض') || 
+                       priceStr.includes('420') || 
+                       priceStr.includes('360');
 
       if (isBundle) {
         const specs = `[${b1.name}: مقاس ${b1.size} - لون ${b1.color}] + [${b2.name}: مقاس ${b2.size} - لون ${b2.color}] + [${b3.name}: مقاس ${b3.size} - لون ${b3.color}]`;
