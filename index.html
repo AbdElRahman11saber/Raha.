@@ -233,6 +233,14 @@
       cursor: pointer;
     }
 
+    .img-zoom-tip {
+      font-size: 0.72rem;
+      color: var(--gold-dark);
+      text-align: center;
+      margin-top: 4px;
+      margin-bottom: 10px;
+    }
+
     .options-title {
       font-size: 0.8rem;
       color: var(--text-muted);
@@ -311,6 +319,40 @@
       margin-top: 8px;
       outline: none;
     }
+
+    /* نافذة تكبير الصورة */
+    #image-lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 10000;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    #image-lightbox.active {
+      display: flex;
+    }
+
+    #image-lightbox img {
+      max-width: 95%;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      color: #FFFFFF;
+      font-size: 2rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -341,7 +383,13 @@
     <div class="catalog-grid" id="catalog-container"></div>
   </main>
 
-  <!-- Product Drawer -->
+  <!-- نافذة تكبير الصورة (Lightbox) -->
+  <div id="image-lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+    <img id="lightbox-img" src="" alt="تكبير الصورة">
+  </div>
+
+  <!-- تفاصيل المنتج / العرض -->
   <div class="drawer-overlay" id="product-drawer">
     <div class="drawer-sheet">
       <div class="sheet-header">
@@ -349,8 +397,11 @@
         <button class="close-icon" onclick="closeDrawer('product-drawer')">&times;</button>
       </div>
 
-      <img id="p-image" src="" style="width: 100%; height: 210px; object-fit: cover; border-radius: 8px;">
-      <p id="p-desc" style="color: var(--text-muted); font-size: 0.85rem; margin: 12px 0; line-height: 1.4;"></p>
+      <!-- الصورة تفتح في وضع التكبير عند الضغط عليها -->
+      <img id="p-image" src="" style="width: 100%; height: 210px; object-fit: cover; border-radius: 8px; cursor: pointer;" onclick="openLightbox(this.src)">
+      <div class="img-zoom-tip">🔍 اضغط على الصورة لتكبيرها</div>
+
+      <p id="p-desc" style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 12px; line-height: 1.4;"></p>
       
       <div class="price-row" style="margin-bottom: 12px;">
         <span id="p-price" style="font-size: 1.25rem; font-weight: 800;"></span>
@@ -364,7 +415,7 @@
         <div class="options-row" id="p-colors"></div>
       </div>
 
-      <!-- خيارات عرض الـ 3 المستقلة لكل جوز -->
+      <!-- خيارات عرض الـ 3 (المنقرش - التايجر - الشفاف) -->
       <div id="bundle-controls" style="display: none;">
         <!-- 1. المنقرش -->
         <div class="bundle-box">
@@ -384,7 +435,7 @@
           <div class="options-row" id="b2-colors"></div>
         </div>
 
-        <!-- 3. الشفاف -->
+        <!-- 3. الشفاف (بديل المجدول) -->
         <div class="bundle-box">
           <div class="bundle-box-title">3. السليبر الشفاف</div>
           <div class="options-title">المقاس:</div>
@@ -398,7 +449,7 @@
     </div>
   </div>
 
-  <!-- Cart Drawer -->
+  <!-- السلة -->
   <div class="drawer-overlay" id="cart-drawer">
     <div class="drawer-sheet">
       <div class="sheet-header">
@@ -433,7 +484,7 @@
       { id: "RAHA-06", title: "سليبر عالي نصين", category: "أحذية وسليبرات", price: 165, onSale: false, desc: "شريط ملون ناعم", img: "https://lh3.googleusercontent.com/d/1eKCfyUUXSz_k6seF3owWsmOX_YBpfwLW", sizes: [37, 38, 39, 40, 41], colors: ["متعدد"] },
       { id: "RAHA-07", title: "سليبر واطي شفاف", category: "أحذية وسليبرات", price: 145, onSale: false, desc: "دانتيل روز مفرغ راقي", img: "https://lh3.googleusercontent.com/d/1xX7rNoc3LL5u28zX63cyOq_ZERDdAwml", sizes: [37, 38, 39, 40, 41], colors: ["اسود", "بيج", "هافان", "كشمير"] },
       { id: "RAHA-08", title: "سليبر واطي تايجر", category: "أحذية وسليبرات", price: 145, onSale: false, desc: "نقشة زيبرا عصرية", img: "https://lh3.googleusercontent.com/d/1THl7Uyou0BmM8eiK9ef0513TYmeLOwfz", sizes: [37, 38, 39, 40, 41], colors: ["اسود", "ابيض", "بني", "فضي", "بيج"] },
-      { id: "RAHA-09", title: "عرض الـ 3 (سليبرات واطية)", category: "العروض", price: 360, onSale: true, desc: "عرض خاص: 3 سليبرات واطية من اختيارك (منقرش، تايجر، شفاف) والشحن مجاناً لجميع المحافظات!", img: "https://lh3.googleusercontent.com/d/11nzQ_9_FpRU0MJzXSkcZAGWeVEwlsfsc", sizes: [37, 38, 39, 40, 41], colors: [] }
+      { id: "RAHA-09", title: "عرض الـ 3 (سليبرات واطية)", category: "العروض", price: 360, onSale: true, desc: "عرض خاص: 3 سليبرات واطية من اختيارك (منقرش، تايجر، شفاف) والشحن مجاناً لجميع المحافظات!", img: "https://lh3.googleusercontent.com/d/102L8qaxd885tI6BbUxy_i6LxaWXcggEZ", sizes: [37, 38, 39, 40, 41], colors: [] }
     ];
 
     let productsData = [...baseProducts];
@@ -593,6 +644,15 @@
       parent.querySelectorAll('.chip-btn').forEach(c => c.classList.remove('selected'));
       elem.classList.add('selected');
       if (parent._onSelect) parent._onSelect(val);
+    }
+
+    function openLightbox(src) {
+      document.getElementById('lightbox-img').src = src;
+      document.getElementById('image-lightbox').classList.add('active');
+    }
+
+    function closeLightbox() {
+      document.getElementById('image-lightbox').classList.remove('active');
     }
 
     function addToCartConfirm() {
