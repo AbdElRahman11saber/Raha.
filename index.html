@@ -291,7 +291,6 @@
       margin-bottom: 6px;
     }
 
-    /* عداد الكمية */
     .qty-container {
       display: flex;
       align-items: center;
@@ -467,7 +466,6 @@
         </div>
       </div>
 
-      <!-- اختيار الكمية -->
       <div class="options-title">الكمية:</div>
       <div class="qty-container">
         <button class="qty-btn" onclick="changeQuantity(-1)">-</button>
@@ -487,7 +485,6 @@
       </div>
       <div id="cart-list"></div>
 
-      <!-- خانة كود الخصم -->
       <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border);">
         <div style="display: flex; gap: 6px;">
           <input type="text" id="coupon-input" class="text-input" placeholder="ادخل كود الخصم (مثال: RAHA10)" style="margin-top: 0; text-transform: uppercase;">
@@ -525,7 +522,7 @@
     const waNumber = "201203541255";
 
     let productsData = [];
-    let couponsData = {}; // تخزين الأكواد المقروءة من الإكسل
+    let couponsData = {}; 
     let currentFilter = 'all';
     let activeItem = null;
     let selectedSize = null;
@@ -537,7 +534,7 @@
     let b3 = { name: '', size: '37', color: '' };
 
     let cart = [];
-    let appliedCoupon = null; // الكود المستخدم حالياً
+    let appliedCoupon = null;
 
     try {
       cart = JSON.parse(localStorage.getItem('raha_cart')) || [];
@@ -556,7 +553,6 @@
         const arrayBuffer = await response.arrayBuffer();
         const workbook = XLSX.read(arrayBuffer, { type: 'array' });
         
-        // 1. قراءة المنتجات من الشيت الأول
         const wsProducts = workbook.Sheets[workbook.SheetNames[0]];
         const rawProducts = XLSX.utils.sheet_to_json(wsProducts);
         
@@ -571,7 +567,6 @@
           onSale: row['هل عليه عرض؟'] === 'نعم' || row['عروض'] === 'نعم'
         }));
 
-        // 2. قراءة الأكواد من الشيت الثاني لو موجود
         if (workbook.SheetNames.length > 1) {
           const wsCoupons = workbook.Sheets['الأكواد'] || workbook.Sheets[workbook.SheetNames[1]];
           if (wsCoupons) {
@@ -580,10 +575,12 @@
               const code = String(row['كود الخصم'] || '').trim().toUpperCase();
               const type = String(row['نوع الخصم (نسبة / ثابت)'] || row['نوع الخصم'] || 'نسبة').trim();
               const val = Number(row['قيمة الخصم'] || 0);
+              const maxUses = Number(row['MaxUses'] || row['الحد الأقصى'] || 9999);
+              const usedCount = Number(row['UsedCount'] || row['الاستخدامات الحالية'] || 0);
               const status = String(row['الحالة'] || 'مفعل').trim();
 
               if (code && status === 'مفعل') {
-                couponsData[code] = { type: type, value: val };
+                couponsData[code] = { type, value: val, maxUses, usedCount };
               }
             });
           }
@@ -812,17 +809,27 @@
         return;
       }
 
-      if (couponsData[codeInput]) {
-        appliedCoupon = { code: codeInput, ...couponsData[codeInput] };
-        msgDiv.innerText = `تم تطبيق الكود (${codeInput}) بنجاح! 🎉`;
-        msgDiv.style.color = "#27ae60";
-        syncCartUI();
-      } else {
+      const coupon = couponsData[codeInput];
+      if (!coupon) {
         msgDiv.innerText = "هذا الكود غير صحيح أو غير مفعل.";
         msgDiv.style.color = "#c0392b";
         appliedCoupon = null;
         syncCartUI();
+        return;
       }
+
+      if (coupon.usedCount >= coupon.maxUses) {
+        msgDiv.innerText = "عذراً، انتهت صلاحية هذا الكود (تم استنفاد عدد الاستخدامات).";
+        msgDiv.style.color = "#c0392b";
+        appliedCoupon = null;
+        syncCartUI();
+        return;
+      }
+
+      appliedCoupon = { code: codeInput, ...coupon };
+      msgDiv.innerText = `تم تطبيق الكود (${codeInput}) بنجاح! 🎉`;
+      msgDiv.style.color = "#27ae60";
+      syncCartUI();
     }
 
     function syncCartUI() {
