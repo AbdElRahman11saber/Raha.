@@ -291,6 +291,37 @@
       margin-bottom: 6px;
     }
 
+    /* عداد الكمية */
+    .qty-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+      background: var(--bg);
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      width: fit-content;
+    }
+    .qty-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .qty-val {
+      font-weight: 700;
+      font-size: 1rem;
+      min-width: 20px;
+      text-align: center;
+    }
+
     .primary-btn {
       width: 100%;
       background: var(--text-main);
@@ -436,6 +467,14 @@
         </div>
       </div>
 
+      <!-- اختيار الكمية -->
+      <div class="options-title">الكمية:</div>
+      <div class="qty-container">
+        <button class="qty-btn" onclick="changeQuantity(-1)">-</button>
+        <span class="qty-val" id="item-qty">1</span>
+        <button class="qty-btn" onclick="changeQuantity(1)">+</button>
+      </div>
+
       <button class="primary-btn" onclick="addToCartConfirm()">إضافة إلى السلة</button>
     </div>
   </div>
@@ -447,12 +486,32 @@
         <button class="close-icon" onclick="closeDrawer('cart-drawer')">&times;</button>
       </div>
       <div id="cart-list"></div>
-      <div style="display:flex; justify-content:space-between; margin-top:14px; font-weight:700;">
-        <span>الإجمالي:</span>
-        <span id="cart-total-val">0 ج.م</span>
+
+      <!-- خانة كود الخصم -->
+      <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border);">
+        <div style="display: flex; gap: 6px;">
+          <input type="text" id="coupon-input" class="text-input" placeholder="ادخل كود الخصم (مثال: RAHA10)" style="margin-top: 0; text-transform: uppercase;">
+          <button type="button" onclick="applyCoupon()" style="padding: 0 16px; background: var(--text-main); color: var(--bg); border: none; border-radius: 6px; font-weight: 700; cursor: pointer; white-space: nowrap;">تطبيق</button>
+        </div>
+        <div id="coupon-msg" style="font-size: 0.75rem; margin-top: 4px;"></div>
       </div>
 
-      <form onsubmit="handleOrderSubmit(event)" style="margin-top: 18px;">
+      <div style="margin-top: 12px; font-size: 0.9rem;">
+        <div style="display:flex; justify-content:space-between; margin-bottom: 4px;">
+          <span>المجموع الفرعي:</span>
+          <span id="subtotal-val">0 ج.م</span>
+        </div>
+        <div id="discount-row" style="display:flex; justify-content:space-between; margin-bottom: 4px; color: #27ae60; display: none;">
+          <span>الخصم (<span id="coupon-name-display"></span>):</span>
+          <span id="discount-val">-0 ج.م</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-weight:700; font-size: 1.1rem; border-top: 1px solid var(--border); padding-top: 6px; margin-top: 6px;">
+          <span>الإجمالي النهائي:</span>
+          <span id="cart-total-val">0 ج.م</span>
+        </div>
+      </div>
+
+      <form onsubmit="handleOrderSubmit(event)" style="margin-top: 16px;">
         <input type="text" id="cust-name" class="text-input" placeholder="الاسم بالكامل" required>
         <input type="tel" id="cust-phone" class="text-input" placeholder="رقم الهاتف (واتساب)" required>
         <textarea id="cust-address" class="text-input" rows="2" placeholder="العنوان بالتفصيل والمحافظة" required></textarea>
@@ -462,20 +521,24 @@
   </div>
 
   <script>
-    const EXCEL_FILE_URL = "متجر_RAHA_الاحترافي-v2.xlsx";
+    const EXCEL_FILE_URL = "متجر_RAHA_الاحترافي_مع_الأكواد.xlsx";
     const waNumber = "201203541255";
 
     let productsData = [];
+    let couponsData = {}; // تخزين الأكواد المقروءة من الإكسل
     let currentFilter = 'all';
     let activeItem = null;
     let selectedSize = null;
     let selectedColor = null;
+    let currentItemQty = 1;
 
     let b1 = { name: '', size: '37', color: '' };
     let b2 = { name: '', size: '37', color: '' };
     let b3 = { name: '', size: '37', color: '' };
 
     let cart = [];
+    let appliedCoupon = null; // الكود المستخدم حالياً
+
     try {
       cart = JSON.parse(localStorage.getItem('raha_cart')) || [];
     } catch (e) {
@@ -493,11 +556,11 @@
         const arrayBuffer = await response.arrayBuffer();
         const workbook = XLSX.read(arrayBuffer, { type: 'array' });
         
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const rawData = XLSX.utils.sheet_to_json(worksheet);
+        // 1. قراءة المنتجات من الشيت الأول
+        const wsProducts = workbook.Sheets[workbook.SheetNames[0]];
+        const rawProducts = XLSX.utils.sheet_to_json(wsProducts);
         
-        productsData = rawData.map(row => ({
+        productsData = rawProducts.map(row => ({
           id: String(row['معرف المنتج'] || ''),
           title: String(row['اسم المنتج'] || ''),
           price: Number(row['سعر العرض'] || row['السعر الأصلي'] || row['السعر'] || 0),
@@ -507,6 +570,24 @@
           colorsRaw: String(row['الألوان المتاحة'] || ''),
           onSale: row['هل عليه عرض؟'] === 'نعم' || row['عروض'] === 'نعم'
         }));
+
+        // 2. قراءة الأكواد من الشيت الثاني لو موجود
+        if (workbook.SheetNames.length > 1) {
+          const wsCoupons = workbook.Sheets['الأكواد'] || workbook.Sheets[workbook.SheetNames[1]];
+          if (wsCoupons) {
+            const rawCoupons = XLSX.utils.sheet_to_json(wsCoupons);
+            rawCoupons.forEach(row => {
+              const code = String(row['كود الخصم'] || '').trim().toUpperCase();
+              const type = String(row['نوع الخصم (نسبة / ثابت)'] || row['نوع الخصم'] || 'نسبة').trim();
+              const val = Number(row['قيمة الخصم'] || 0);
+              const status = String(row['الحالة'] || 'مفعل').trim();
+
+              if (code && status === 'مفعل') {
+                couponsData[code] = { type: type, value: val };
+              }
+            });
+          }
+        }
 
         if (productsData.length > 0) {
           renderCatalog();
@@ -565,6 +646,9 @@
       activeItem = productsData.find(p => String(p.id).trim() === String(id).trim());
       if (!activeItem) return;
 
+      currentItemQty = 1;
+      document.getElementById('item-qty').innerText = currentItemQty;
+
       document.getElementById('p-title').innerText = activeItem.title;
       document.getElementById('p-image').src = activeItem.img;
       document.getElementById('p-desc').innerText = activeItem.desc;
@@ -600,6 +684,12 @@
       document.getElementById('product-drawer').classList.add('active');
     }
 
+    function changeQuantity(val) {
+      currentItemQty += val;
+      if (currentItemQty < 1) currentItemQty = 1;
+      document.getElementById('item-qty').innerText = currentItemQty;
+    }
+
     function selectSingleOption(containerId, elem, val, type) {
       document.querySelectorAll(`#${containerId} .chip-btn`).forEach(el => el.classList.remove('selected'));
       elem.classList.add('selected');
@@ -627,16 +717,6 @@
         document.getElementById('b1-title').innerText = '1. السليبر المنقرش';
         document.getElementById('b2-title').innerText = '2. السليبر التايجر';
         document.getElementById('b3-title').innerText = '3. السليبر الشفاف';
-
-        if (activeItem && activeItem.colorsRaw) {
-          const parts = String(activeItem.colorsRaw).split('-');
-          if (parts.length >= 3) {
-            const parseList = (str) => str.replace(/[()]/g, '').split(/[,،]/).map(s => s.trim()).filter(Boolean);
-            colors1 = parseList(parts[0]) || colors1;
-            colors2 = parseList(parts[1]) || colors2;
-            colors3 = parseList(parts[2]) || colors3;
-          }
-        }
       }
 
       b1 = { name: document.getElementById('b1-title').innerText, size: '37', color: colors1[0] };
@@ -690,13 +770,13 @@
           price: activeItem.price,
           size: '3 قطع',
           color: specs,
-          qty: 1
+          qty: currentItemQty
         });
       } else {
         const itemKey = `${activeItem.id}-${selectedSize}-${selectedColor}`;
         const found = cart.find(i => i.key === itemKey);
         if (found) {
-          found.qty += 1;
+          found.qty += currentItemQty;
         } else {
           cart.push({
             key: itemKey,
@@ -705,7 +785,7 @@
             price: activeItem.price,
             size: selectedSize,
             color: selectedColor,
-            qty: 1
+            qty: currentItemQty
           });
         }
       }
@@ -722,6 +802,29 @@
       syncCartUI();
     }
 
+    function applyCoupon() {
+      const codeInput = document.getElementById('coupon-input').value.trim().toUpperCase();
+      const msgDiv = document.getElementById('coupon-msg');
+
+      if (!codeInput) {
+        msgDiv.innerText = "من فضلك ادخل الكود أولاً.";
+        msgDiv.style.color = "#c0392b";
+        return;
+      }
+
+      if (couponsData[codeInput]) {
+        appliedCoupon = { code: codeInput, ...couponsData[codeInput] };
+        msgDiv.innerText = `تم تطبيق الكود (${codeInput}) بنجاح! 🎉`;
+        msgDiv.style.color = "#27ae60";
+        syncCartUI();
+      } else {
+        msgDiv.innerText = "هذا الكود غير صحيح أو غير مفعل.";
+        msgDiv.style.color = "#c0392b";
+        appliedCoupon = null;
+        syncCartUI();
+      }
+    }
+
     function syncCartUI() {
       const count = cart.reduce((total, i) => total + i.qty, 0);
       document.getElementById('cart-count').innerText = count;
@@ -729,26 +832,49 @@
       const listContainer = document.getElementById('cart-list');
       if (cart.length === 0) {
         listContainer.innerHTML = '<p style="text-align:center; color: var(--text-muted); padding:20px;">السلة فارغة</p>';
+        document.getElementById('subtotal-val').innerText = '0 ج.م';
         document.getElementById('cart-total-val').innerText = '0 ج.م';
+        document.getElementById('discount-row').style.display = 'none';
+        appliedCoupon = null;
         return;
       }
 
-      let total = 0;
+      let subtotal = 0;
       listContainer.innerHTML = cart.map((item, index) => {
-        total += item.price * item.qty;
+        subtotal += item.price * item.qty;
         return `
           <div class="cart-line">
             <div style="max-width: 85%;">
               <div style="font-weight:700; font-size:0.9rem;">${item.title}</div>
               <div style="font-size:0.75rem; color:var(--text-muted); line-height: 1.4; margin-top:2px;">${item.color}</div>
-              <div style="font-size:0.85rem; font-weight:700; margin-top: 3px;">${item.price} ج.م × ${item.qty}</div>
+              <div style="font-size:0.85rem; font-weight:700; margin-top: 3px;">${item.price} ج.م × ${item.qty} = ${item.price * item.qty} ج.م</div>
             </div>
             <button onclick="deleteItem(${index})" style="background:none; border:none; color:#c0392b; font-size:1.1rem; cursor:pointer;">✕</button>
           </div>
         `;
       }).join('');
 
-      document.getElementById('cart-total-val').innerText = `${total} ج.م`;
+      let discountAmount = 0;
+      if (appliedCoupon) {
+        if (appliedCoupon.type === 'نسبة') {
+          discountAmount = subtotal * (appliedCoupon.value / 100);
+        } else {
+          discountAmount = appliedCoupon.value;
+        }
+        if (discountAmount > subtotal) discountAmount = subtotal;
+
+        document.getElementById('discount-row').style.display = 'flex';
+        document.getElementById('coupon-name-display').innerText = appliedCoupon.code;
+        document.getElementById('discount-val').innerText = `-${discountAmount} ج.م`;
+      } else {
+        document.getElementById('discount-row').style.display = 'none';
+      }
+
+      let finalTotal = subtotal - discountAmount;
+      if (finalTotal < 0) finalTotal = 0;
+
+      document.getElementById('subtotal-val').innerText = `${subtotal} ج.م`;
+      document.getElementById('cart-total-val').innerText = `${finalTotal} ج.م`;
     }
 
     function deleteItem(idx) {
@@ -772,18 +898,35 @@
       const name = document.getElementById('cust-name').value;
       const phone = document.getElementById('cust-phone').value;
       const address = document.getElementById('cust-address').value;
-      const total = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+      
+      let subtotal = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+      let discountAmount = 0;
+      if (appliedCoupon) {
+        if (appliedCoupon.type === 'نسبة') {
+          discountAmount = subtotal * (appliedCoupon.value / 100);
+        } else {
+          discountAmount = appliedCoupon.value;
+        }
+      }
+      let finalTotal = subtotal - discountAmount;
+      if (finalTotal < 0) finalTotal = 0;
 
       let msg = `طلب جديد من متجر RAHA:\nالاسم: ${name}\nالهاتف: ${phone}\nالعنوان: ${address}\n\nتفاصيل المنتجات:\n`;
       cart.forEach(i => {
         msg += `- ${i.title} × ${i.qty}\n  ${i.color}\n`;
       });
-      msg += `\nالإجمالي: ${total} ج.م (شامل مصاريف الشحن)`;
+      
+      msg += `\nالمجموع الفرعي: ${subtotal} ج.م`;
+      if (appliedCoupon) {
+        msg += `\nكود الخصم المستخدم: ${appliedCoupon.code} (- ${discountAmount} ج.م)`;
+      }
+      msg += `\nالإجمالي النهائي: ${finalTotal} ج.م (شامل مصاريف الشحن)`;
 
       const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
       window.open(waUrl, '_blank');
 
       cart = [];
+      appliedCoupon = null;
       saveCartState();
       closeDrawer('cart-drawer');
     }
